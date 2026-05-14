@@ -45,28 +45,11 @@
     }
     header h1 { font-size: 1.6rem; font-weight: 700; }
     header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
-    .controls {
-      padding: 20px 40px;
-      display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-    }
-    .controls label { font-size: 0.82rem; color: var(--muted); margin-right: 4px; }
-    .controls select, .controls input[type=date] {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-    .controls select:focus, .controls input[type=date]:focus { outline: 2px solid var(--accent); }
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
-      padding: 24px 40px 0;
+      padding: 28px 40px 0;
     }
     .kpi {
       background: var(--surface);
@@ -96,8 +79,9 @@
       border-radius: var(--radius);
       padding: 20px;
     }
-    .chart-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: var(--text); }
-    .chart-card canvas { max-height: 280px; }
+    .chart-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .chart-card .hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; }
+    .chart-card canvas { max-height: 300px; }
     .table-section { padding: 0 40px 40px; }
     .table-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
     .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
@@ -128,7 +112,7 @@
     }
     @media (max-width: 700px) {
       header { padding: 20px; }
-      .controls, .kpi-row, .charts-grid, .table-section { padding-left: 16px; padding-right: 16px; }
+      .kpi-row, .charts-grid, .table-section { padding-left: 16px; padding-right: 16px; }
       .charts-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -141,33 +125,6 @@
     <p>Coupa AI &bull; Evaluation Metrics Tracker</p>
   </div>
 </header>
-
-<div class="controls">
-  <div>
-    <label>Version</label>
-    <select id="filterVersion">
-      <option value="all">All Versions</option>
-      <option value="v44.x">v44.x</option>
-      <option value="v43.x">v43.x</option>
-    </select>
-  </div>
-  <div>
-    <label>Dataset</label>
-    <select id="filterDataset"><option value="all">All Datasets</option></select>
-  </div>
-  <div>
-    <label>Model</label>
-    <select id="filterModel"><option value="all">All Models</option></select>
-  </div>
-  <div>
-    <label>From</label>
-    <input type="date" id="filterFrom" />
-  </div>
-  <div>
-    <label>To</label>
-    <input type="date" id="filterTo" />
-  </div>
-</div>
 
 <div class="kpi-row">
   <div class="kpi" style="--kpi-color: var(--accent)">
@@ -200,18 +157,17 @@
 <div class="charts-grid">
   <div class="chart-card">
     <h3>Accuracy Over Time – by Dataset</h3>
+    <p class="hint">Click a legend item to show/hide that dataset</p>
     <canvas id="chartTimeline"></canvas>
   </div>
   <div class="chart-card">
-    <h3>Accuracy by Dataset (Latest per Version)</h3>
+    <h3>Latest Accuracy by Dataset</h3>
+    <p class="hint">Most recent run per dataset across all versions</p>
     <canvas id="chartBar"></canvas>
   </div>
-  <div class="chart-card">
-    <h3>Model Comparison – Avg Accuracy</h3>
-    <canvas id="chartModel"></canvas>
-  </div>
-  <div class="chart-card">
+  <div class="chart-card" style="grid-column: 1 / -1;">
     <h3>Hard Accuracy Trend</h3>
+    <p class="hint">Click a legend item to show/hide a version</p>
     <canvas id="chartHard"></canvas>
   </div>
 </div>
@@ -254,52 +210,24 @@ async function loadAll() {
     model: r.GPT_Model?.trim() || '',
     hardAcc: parseFloat(r.Hard_Accuracy) || null,
   }));
-  populateFilters();
   render();
   document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
-}
-
-function populateFilters() {
-  const datasets = [...new Set(allData.map(d => d.dataset))].sort();
-  const models = [...new Set(allData.map(d => d.model).filter(Boolean))].sort();
-  const ds = document.getElementById('filterDataset');
-  datasets.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; ds.appendChild(o); });
-  const ms = document.getElementById('filterModel');
-  models.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; ms.appendChild(o); });
-}
-
-function getFiltered() {
-  const ver = document.getElementById('filterVersion').value;
-  const ds = document.getElementById('filterDataset').value;
-  const mdl = document.getElementById('filterModel').value;
-  const from = document.getElementById('filterFrom').value;
-  const to = document.getElementById('filterTo').value;
-  return allData.filter(r => {
-    if (ver !== 'all' && r.version !== ver) return false;
-    if (ds !== 'all' && r.dataset !== ds) return false;
-    if (mdl !== 'all' && r.model !== mdl) return false;
-    if (from && r.date < from) return false;
-    if (to && r.date > to) return false;
-    return true;
-  });
 }
 
 let charts = {};
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
 function render() {
-  const data = getFiltered();
-  renderKPIs(data);
-  renderTimeline(data);
-  renderBar(data);
-  renderModelComp(data);
-  renderHard(data);
-  renderTable(data);
+  renderKPIs(allData);
+  renderTimeline(allData);
+  renderBar(allData);
+  renderHard(allData);
+  renderTable(allData);
 }
 
 function renderKPIs(data) {
   const accs = data.filter(d => d.accuracy !== null);
-  if (!accs.length) { ['kpiBest','kpiAvg','kpiTime','kpiRuns','kpiHard'].forEach(id => document.getElementById(id).textContent = '–'); return; }
+  if (!accs.length) return;
   const best = accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
   const avg = accs.reduce((s,r) => s + r.accuracy, 0) / accs.length;
   const times = data.filter(d => d.avgTime !== null);
@@ -324,16 +252,18 @@ function renderTimeline(data) {
     datasets: datasets.map((ds, i) => ({
       label: ds,
       data: data.filter(d => d.dataset === ds && d.accuracy !== null).map(d => ({ x: d.date, y: d.accuracy })),
+      backgroundColor: COLORS[i % COLORS.length],
       borderColor: COLORS[i % COLORS.length],
-      backgroundColor: COLORS[i % COLORS.length] + '33',
-      tension: 0.3, pointRadius: 4, fill: false,
+      pointRadius: 6,
+      pointHoverRadius: 9,
+      showLine: false,
     }))
   };
   const ctx = document.getElementById('chartTimeline').getContext('2d');
   charts['timeline'] = new Chart(ctx, {
-    type: 'line',
+    type: 'scatter',
     data: chartData,
-    options: chartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
+    options: dotChartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
   });
 }
 
@@ -351,51 +281,47 @@ function renderBar(data) {
       labels: datasets,
       datasets: [{ label: 'Latest Accuracy (%)', data: latest, backgroundColor: COLORS, borderRadius: 6 }]
     },
-    options: chartOptions({})
-  });
-}
-
-function renderModelComp(data) {
-  destroyChart('model');
-  const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
-  const avgs = models.map(m => {
-    const rows = data.filter(r => r.model === m && r.accuracy !== null);
-    return rows.length ? rows.reduce((s,r) => s + r.accuracy, 0) / rows.length : null;
-  });
-  const ctx = document.getElementById('chartModel').getContext('2d');
-  charts['model'] = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: models,
-      datasets: [{ label: 'Avg Accuracy (%)', data: avgs, backgroundColor: ['#38bdf8','#818cf8'], borderRadius: 6 }]
-    },
-    options: chartOptions({})
+    options: dotChartOptions({})
   });
 }
 
 function renderHard(data) {
   destroyChart('hard');
-  const hardRows = data.filter(d => d.hardAcc !== null).sort((a,b) => a.date.localeCompare(b.date));
+  const versions = [...new Set(data.map(d => d.version))].sort();
   const ctx = document.getElementById('chartHard').getContext('2d');
   charts['hard'] = new Chart(ctx, {
-    type: 'line',
+    type: 'scatter',
     data: {
-      datasets: [{
-        label: 'Hard Accuracy (%)',
-        data: hardRows.map(d => ({ x: d.date, y: d.hardAcc })),
-        borderColor: '#a78bfa', backgroundColor: '#a78bfa33',
-        tension: 0.3, pointRadius: 5, fill: true,
-      }]
+      datasets: versions.map((ver, i) => {
+        const rows = data.filter(d => d.version === ver && d.hardAcc !== null).sort((a,b) => a.date.localeCompare(b.date));
+        return {
+          label: ver,
+          data: rows.map(d => ({ x: d.date, y: d.hardAcc })),
+          backgroundColor: COLORS[i % COLORS.length],
+          borderColor: COLORS[i % COLORS.length],
+          pointRadius: 7,
+          pointHoverRadius: 10,
+          showLine: false,
+        };
+      })
     },
-    options: chartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
+    options: dotChartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
   });
 }
 
-function chartOptions(xAxis) {
+function dotChartOptions(xAxis) {
   return {
     responsive: true, maintainAspectRatio: true,
     plugins: {
-      legend: { labels: { color: '#94a3b8', boxWidth: 12 } },
+      legend: {
+        labels: { color: '#94a3b8', boxWidth: 12 },
+        onClick(e, legendItem, legend) {
+          const index = legendItem.datasetIndex;
+          const ci = legend.chart;
+          if (ci.isDatasetVisible(index)) ci.hide(index);
+          else ci.show(index);
+        }
+      },
       tooltip: { backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1, titleColor: '#e2e8f0', bodyColor: '#94a3b8' }
     },
     scales: {
@@ -424,10 +350,6 @@ function renderTable(data) {
     tb.appendChild(tr);
   });
 }
-
-['filterVersion','filterDataset','filterModel','filterFrom','filterTo'].forEach(id => {
-  document.getElementById(id).addEventListener('change', render);
-});
 
 loadAll();
 </script>
