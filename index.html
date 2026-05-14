@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics Agent – Model Performance Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #273349;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #34d399;
+      --accent4: #fb923c;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: #0f172a;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+    .controls {
+      padding: 20px 40px;
+      display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .controls label { font-size: 0.82rem; color: var(--muted); margin-right: 4px; }
+    .controls select, .controls input[type=date] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .controls select:focus, .controls input[type=date]:focus { outline: 2px solid var(--accent); }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      padding: 24px 40px 0;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--kpi-color, var(--accent));
+    }
+    .kpi .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .kpi .value { font-size: 2rem; font-weight: 700; margin-top: 6px; color: var(--kpi-color, var(--accent)); }
+    .kpi .sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 20px;
+      padding: 24px 40px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .chart-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+    .chart-card canvas { max-height: 280px; }
+    .table-section { padding: 0 40px 40px; }
+    .table-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    thead tr { background: var(--surface2); }
+    th { padding: 12px 16px; text-align: left; color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+    tbody tr { border-top: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: var(--surface2); }
+    td { padding: 10px 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-v44 { background: rgba(56,189,248,0.15); color: var(--accent); }
+    .badge-v43 { background: rgba(129,140,248,0.15); color: var(--accent2); }
+    .acc-high { color: var(--accent3); font-weight: 600; }
+    .acc-mid { color: var(--accent4); font-weight: 600; }
+    .acc-low { color: #f87171; font-weight: 600; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 700px) {
+      header { padding: 20px; }
+      .controls, .kpi-row, .charts-grid, .table-section { padding-left: 16px; padding-right: 16px; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">A</div>
+  <div>
+    <h1>Analytics Agent &ndash; Model Performance Dashboard</h1>
+    <p>Coupa AI &bull; Evaluation Metrics Tracker</p>
+  </div>
+</header>
+
+<div class="controls">
+  <div>
+    <label>Version</label>
+    <select id="filterVersion">
+      <option value="all">All Versions</option>
+      <option value="v44.x">v44.x</option>
+      <option value="v43.x">v43.x</option>
+    </select>
+  </div>
+  <div>
+    <label>Dataset</label>
+    <select id="filterDataset"><option value="all">All Datasets</option></select>
+  </div>
+  <div>
+    <label>Model</label>
+    <select id="filterModel"><option value="all">All Models</option></select>
+  </div>
+  <div>
+    <label>From</label>
+    <input type="date" id="filterFrom" />
+  </div>
+  <div>
+    <label>To</label>
+    <input type="date" id="filterTo" />
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi" style="--kpi-color: var(--accent)">
+    <div class="label">Best Accuracy</div>
+    <div class="value" id="kpiBest">–</div>
+    <div class="sub" id="kpiBestSub"></div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--accent2)">
+    <div class="label">Avg Accuracy</div>
+    <div class="value" id="kpiAvg">–</div>
+    <div class="sub" id="kpiAvgSub"></div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--accent3)">
+    <div class="label">Avg Query Time</div>
+    <div class="value" id="kpiTime">–</div>
+    <div class="sub">seconds</div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--accent4)">
+    <div class="label">Total Runs</div>
+    <div class="value" id="kpiRuns">–</div>
+    <div class="sub" id="kpiRunsSub"></div>
+  </div>
+  <div class="kpi" style="--kpi-color: #a78bfa">
+    <div class="label">Best Hard Accuracy</div>
+    <div class="value" id="kpiHard">–</div>
+    <div class="sub" id="kpiHardSub"></div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Accuracy Over Time – by Dataset</h3>
+    <canvas id="chartTimeline"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Accuracy by Dataset (Latest per Version)</h3>
+    <canvas id="chartBar"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Model Comparison – Avg Accuracy</h3>
+    <canvas id="chartModel"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Hard Accuracy Trend</h3>
+    <canvas id="chartHard"></canvas>
+  </div>
+</div>
+
+<div class="table-section">
+  <h3>All Evaluation Runs</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Version</th><th>Date</th><th>Dataset</th><th>Accuracy (%)</th>
+          <th>Avg Time (s)</th><th>GPT Model</th><th>Hard Accuracy (%)</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>Last updated: <span id="lastUpdated"></span> &bull; <a href="https://github.com/analytics-agent-coupa/analytics-agent-coupa.github.io" style="color:var(--accent)" target="_blank">View on GitHub</a></footer>
+
+<script>
+const FILES = ['data/v44x.csv','data/v43x.csv'];
+let allData = [];
+
+const COLORS = [
+  '#38bdf8','#818cf8','#34d399','#fb923c','#f472b6','#a78bfa','#facc15','#4ade80'
+];
+
+async function loadAll() {
+  const results = await Promise.all(FILES.map(f => new Promise(resolve => {
+    Papa.parse(f, { download: true, header: true, skipEmptyLines: true, complete: r => resolve(r.data) });
+  })));
+  allData = results.flat().map(r => ({
+    version: r.Version?.trim() || '',
+    date: r.Date?.trim() || '',
+    dataset: r.Dataset?.trim() || '',
+    accuracy: parseFloat(r.Accuracy) || null,
+    avgTime: parseFloat(r.Avg_Time_per_Query) || null,
+    model: r.GPT_Model?.trim() || '',
+    hardAcc: parseFloat(r.Hard_Accuracy) || null,
+  }));
+  populateFilters();
+  render();
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+}
+
+function populateFilters() {
+  const datasets = [...new Set(allData.map(d => d.dataset))].sort();
+  const models = [...new Set(allData.map(d => d.model).filter(Boolean))].sort();
+  const ds = document.getElementById('filterDataset');
+  datasets.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; ds.appendChild(o); });
+  const ms = document.getElementById('filterModel');
+  models.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; ms.appendChild(o); });
+}
+
+function getFiltered() {
+  const ver = document.getElementById('filterVersion').value;
+  const ds = document.getElementById('filterDataset').value;
+  const mdl = document.getElementById('filterModel').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  return allData.filter(r => {
+    if (ver !== 'all' && r.version !== ver) return false;
+    if (ds !== 'all' && r.dataset !== ds) return false;
+    if (mdl !== 'all' && r.model !== mdl) return false;
+    if (from && r.date < from) return false;
+    if (to && r.date > to) return false;
+    return true;
+  });
+}
+
+let charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function render() {
+  const data = getFiltered();
+  renderKPIs(data);
+  renderTimeline(data);
+  renderBar(data);
+  renderModelComp(data);
+  renderHard(data);
+  renderTable(data);
+}
+
+function renderKPIs(data) {
+  const accs = data.filter(d => d.accuracy !== null);
+  if (!accs.length) { ['kpiBest','kpiAvg','kpiTime','kpiRuns','kpiHard'].forEach(id => document.getElementById(id).textContent = '–'); return; }
+  const best = accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
+  const avg = accs.reduce((s,r) => s + r.accuracy, 0) / accs.length;
+  const times = data.filter(d => d.avgTime !== null);
+  const avgTime = times.length ? times.reduce((s,r) => s + r.avgTime, 0) / times.length : null;
+  const hards = data.filter(d => d.hardAcc !== null);
+  const bestHard = hards.length ? hards.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
+  document.getElementById('kpiBest').textContent = best.accuracy.toFixed(1) + '%';
+  document.getElementById('kpiBestSub').textContent = best.dataset + ' · ' + best.date;
+  document.getElementById('kpiAvg').textContent = avg.toFixed(1) + '%';
+  document.getElementById('kpiAvgSub').textContent = accs.length + ' runs';
+  document.getElementById('kpiTime').textContent = avgTime !== null ? avgTime.toFixed(2) + 's' : '–';
+  document.getElementById('kpiRuns').textContent = data.length;
+  document.getElementById('kpiRunsSub').textContent = [...new Set(data.map(d=>d.version))].join(', ');
+  document.getElementById('kpiHard').textContent = bestHard ? bestHard.hardAcc.toFixed(1) + '%' : '–';
+  document.getElementById('kpiHardSub').textContent = bestHard ? bestHard.date : '';
+}
+
+function renderTimeline(data) {
+  destroyChart('timeline');
+  const datasets = [...new Set(data.map(d => d.dataset))].sort();
+  const chartData = {
+    datasets: datasets.map((ds, i) => ({
+      label: ds,
+      data: data.filter(d => d.dataset === ds && d.accuracy !== null).map(d => ({ x: d.date, y: d.accuracy })),
+      borderColor: COLORS[i % COLORS.length],
+      backgroundColor: COLORS[i % COLORS.length] + '33',
+      tension: 0.3, pointRadius: 4, fill: false,
+    }))
+  };
+  const ctx = document.getElementById('chartTimeline').getContext('2d');
+  charts['timeline'] = new Chart(ctx, {
+    type: 'line',
+    data: chartData,
+    options: chartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
+  });
+}
+
+function renderBar(data) {
+  destroyChart('bar');
+  const datasets = [...new Set(data.map(d => d.dataset))].sort();
+  const latest = datasets.map(ds => {
+    const rows = data.filter(r => r.dataset === ds && r.accuracy !== null).sort((a,b) => b.date.localeCompare(a.date));
+    return rows[0] ? rows[0].accuracy : null;
+  });
+  const ctx = document.getElementById('chartBar').getContext('2d');
+  charts['bar'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: datasets,
+      datasets: [{ label: 'Latest Accuracy (%)', data: latest, backgroundColor: COLORS, borderRadius: 6 }]
+    },
+    options: chartOptions({})
+  });
+}
+
+function renderModelComp(data) {
+  destroyChart('model');
+  const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
+  const avgs = models.map(m => {
+    const rows = data.filter(r => r.model === m && r.accuracy !== null);
+    return rows.length ? rows.reduce((s,r) => s + r.accuracy, 0) / rows.length : null;
+  });
+  const ctx = document.getElementById('chartModel').getContext('2d');
+  charts['model'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: models,
+      datasets: [{ label: 'Avg Accuracy (%)', data: avgs, backgroundColor: ['#38bdf8','#818cf8'], borderRadius: 6 }]
+    },
+    options: chartOptions({})
+  });
+}
+
+function renderHard(data) {
+  destroyChart('hard');
+  const hardRows = data.filter(d => d.hardAcc !== null).sort((a,b) => a.date.localeCompare(b.date));
+  const ctx = document.getElementById('chartHard').getContext('2d');
+  charts['hard'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'Hard Accuracy (%)',
+        data: hardRows.map(d => ({ x: d.date, y: d.hardAcc })),
+        borderColor: '#a78bfa', backgroundColor: '#a78bfa33',
+        tension: 0.3, pointRadius: 5, fill: true,
+      }]
+    },
+    options: chartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
+  });
+}
+
+function chartOptions(xAxis) {
+  return {
+    responsive: true, maintainAspectRatio: true,
+    plugins: {
+      legend: { labels: { color: '#94a3b8', boxWidth: 12 } },
+      tooltip: { backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1, titleColor: '#e2e8f0', bodyColor: '#94a3b8' }
+    },
+    scales: {
+      x: Object.assign({ ticks: { color: '#94a3b8' }, grid: { color: '#1e293b33' } }, xAxis.x || {}),
+      y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, title: { display: true, text: 'Accuracy (%)', color: '#94a3b8' } }
+    }
+  };
+}
+
+function renderTable(data) {
+  const tb = document.getElementById('tableBody');
+  tb.innerHTML = '';
+  const sorted = [...data].sort((a,b) => b.date.localeCompare(a.date));
+  sorted.forEach(r => {
+    const tr = document.createElement('tr');
+    const accClass = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
+    tr.innerHTML = `
+      <td><span class="badge ${r.version === 'v44.x' ? 'badge-v44' : 'badge-v43'}">${r.version}</span></td>
+      <td>${r.date}</td>
+      <td>${r.dataset}</td>
+      <td class="${accClass}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td>
+      <td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>
+      <td>${r.model || '–'}</td>
+      <td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+['filterVersion','filterDataset','filterModel','filterFrom','filterTo'].forEach(id => {
+  document.getElementById(id).addEventListener('change', render);
+});
+
+loadAll();
+</script>
+</body>
+</html>
