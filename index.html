@@ -55,6 +55,7 @@
       padding: 24px; cursor: pointer; position: relative; overflow: hidden;
       transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
       user-select: none;
+      display: flex; flex-direction: column;
     }
     .mc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--mc-color, var(--accent)); }
     .mc:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.4); }
@@ -79,15 +80,37 @@
 
     .mc-meta { font-size: 0.72rem; color: var(--muted); padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; }
 
+    /* CTA button — prominent, full-width, pill-style */
     .mc-cta {
-      margin-top: 16px; display: flex; align-items: center; gap: 6px;
-      font-size: 0.75rem; font-weight: 600; color: var(--mc-color, var(--accent));
-      opacity: 0.85;
+      margin-top: auto;
+      padding-top: 18px;
     }
-    .mc-cta .arrow { transition: transform 0.18s; display: inline-block; }
-    .mc:hover .mc-cta { opacity: 1; }
-    .mc:hover .mc-cta .arrow { transform: translateX(4px); }
-    .mc.active .mc-cta .arrow { transform: rotate(90deg); }
+    .mc-cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1.5px solid var(--mc-color, var(--accent));
+      background: color-mix(in srgb, var(--mc-color, var(--accent)) 12%, transparent);
+      color: var(--mc-color, var(--accent));
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+    .mc:hover .mc-cta-btn {
+      background: color-mix(in srgb, var(--mc-color, var(--accent)) 22%, transparent);
+      box-shadow: 0 0 12px color-mix(in srgb, var(--mc-color, var(--accent)) 30%, transparent);
+    }
+    .mc.active .mc-cta-btn {
+      background: color-mix(in srgb, var(--mc-color, var(--accent)) 25%, transparent);
+    }
+    .mc-cta-btn .arrow { font-size: 1rem; transition: transform 0.18s; }
+    .mc:hover .mc-cta-btn .arrow { transform: translateX(3px); }
+    .mc.active .mc-cta-btn .arrow { transform: rotate(90deg); }
 
     .detail-panel {
       margin: 20px 40px 0;
@@ -219,7 +242,12 @@
       </div>
     </div>
     <div class="mc-meta" id="mc-v44-meta">–</div>
-    <div class="mc-cta"><span id="mc-v44-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+    <div class="mc-cta">
+      <div class="mc-cta-btn">
+        <span id="mc-v44-cta-text">View Charts &amp; Details</span>
+        <span class="arrow">&#8250;</span>
+      </div>
+    </div>
   </div>
 
   <div class="mc" id="mc-v43" style="--mc-color: #818cf8" onclick="toggleDetail('v43')">
@@ -237,7 +265,12 @@
       </div>
     </div>
     <div class="mc-meta" id="mc-v43-meta">–</div>
-    <div class="mc-cta"><span id="mc-v43-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+    <div class="mc-cta">
+      <div class="mc-cta-btn">
+        <span id="mc-v43-cta-text">View Charts &amp; Details</span>
+        <span class="arrow">&#8250;</span>
+      </div>
+    </div>
   </div>
 
   <div class="mc" id="mc-think" style="--mc-color: #34d399" onclick="toggleDetail('think')">
@@ -248,7 +281,12 @@
       <div class="mc-stat-sub" id="mc-think-acc-sub">–</div>
     </div>
     <div class="mc-meta" id="mc-think-meta">–</div>
-    <div class="mc-cta"><span id="mc-think-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+    <div class="mc-cta">
+      <div class="mc-cta-btn">
+        <span id="mc-think-cta-text">View Charts &amp; Details</span>
+        <span class="arrow">&#8250;</span>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -423,12 +461,10 @@ function renderKPIs() {
 }
 
 function populateCards() {
-  // v44
   const v44rows = allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking');
   if (v44rows.length) {
-    const v44accs = v44rows.filter(r => r.accuracy !== null);
-    const bestA = v44accs.length ? v44accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
-    if (bestA) {
+    const bestA = v44rows.filter(r => r.accuracy !== null).reduce((a,b) => a.accuracy > b.accuracy ? a : b, {accuracy:-1});
+    if (bestA.accuracy >= 0) {
       document.getElementById('mc-v44-acc').textContent = bestA.accuracy.toFixed(1) + '%';
       document.getElementById('mc-v44-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
     }
@@ -439,16 +475,13 @@ function populateCards() {
       document.getElementById('mc-v44-hard-sub').textContent = bestH.dataset + ' · ' + bestH.date;
     }
     const models = [...new Set(v44rows.map(r => r.model).filter(Boolean))];
-    document.getElementById('mc-v44-meta').textContent =
-      `${v44rows.length} runs · Models: ${models.join(', ')}`;
+    document.getElementById('mc-v44-meta').textContent = `${v44rows.length} runs · Models: ${models.join(', ')}`;
   }
 
-  // v43
   const v43rows = allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking');
   if (v43rows.length) {
-    const v43accs = v43rows.filter(r => r.accuracy !== null);
-    const bestA = v43accs.length ? v43accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
-    if (bestA) {
+    const bestA = v43rows.filter(r => r.accuracy !== null).reduce((a,b) => a.accuracy > b.accuracy ? a : b, {accuracy:-1});
+    if (bestA.accuracy >= 0) {
       document.getElementById('mc-v43-acc').textContent = bestA.accuracy.toFixed(1) + '%';
       document.getElementById('mc-v43-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
     }
@@ -459,48 +492,37 @@ function populateCards() {
       document.getElementById('mc-v43-hard-sub').textContent = bestH.dataset + ' · ' + bestH.date;
     }
     const dates = v43rows.map(r => r.date).filter(Boolean).sort();
-    document.getElementById('mc-v43-meta').textContent =
-      `${v43rows.length} runs · ${dates[0]} to ${dates[dates.length-1]}`;
+    document.getElementById('mc-v43-meta').textContent = `${v43rows.length} runs · ${dates[0]} to ${dates[dates.length-1]}`;
   }
 
-  // thinking — no version reference
   const thinkRows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
   if (thinkRows.length) {
     const bestA = thinkRows.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
     document.getElementById('mc-think-acc').textContent = bestA.accuracy.toFixed(1) + '%';
     document.getElementById('mc-think-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
-    document.getElementById('mc-think-meta').textContent =
-      `${thinkRows.length} runs · Dataset: revised_GD`;
+    document.getElementById('mc-think-meta').textContent = `${thinkRows.length} runs · Dataset: revised_GD`;
   }
 }
 
 function toggleDetail(key) {
-  if (activeDetail === key) {
-    closeDetail();
-    return;
-  }
+  if (activeDetail === key) { closeDetail(); return; }
   document.querySelectorAll('.mc').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.detail-section').forEach(s => s.style.display = 'none');
   ['v44','v43','think'].forEach(k => {
     const el = document.getElementById('mc-' + k + '-cta-text');
-    if (el) el.textContent = 'Click to view details';
+    if (el) el.innerHTML = 'View Charts &amp; Details';
   });
   document.getElementById('mc-' + key).classList.add('active');
-  document.getElementById('mc-' + key + '-cta-text').textContent = 'Collapse';
+  document.getElementById('mc-' + key + '-cta-text').textContent = 'Collapse ✕';
   document.getElementById('detail-' + key).style.display = 'block';
 
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
 
-  const titles = {
-    v44: 'v44.x — Detailed View',
-    v43: 'v43.x — Detailed View',
-    think: '🧠 Thinking Model — Detailed View'
-  };
+  const titles = { v44: 'v44.x — Detailed View', v43: 'v43.x — Detailed View', think: '🧠 Thinking Model — Detailed View' };
   const colors = { v44: '#38bdf8', v43: '#818cf8', think: '#34d399' };
   document.getElementById('dpTitle').textContent = titles[key];
-  document.getElementById('dpHeader').style.background =
-    `linear-gradient(90deg, ${colors[key]}1a 0%, transparent 80%)`;
+  document.getElementById('dpHeader').style.background = `linear-gradient(90deg, ${colors[key]}1a 0%, transparent 80%)`;
 
   setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
 
@@ -519,87 +541,70 @@ function closeDetail() {
   document.querySelectorAll('.detail-section').forEach(s => s.style.display = 'none');
   ['v44','v43','think'].forEach(k => {
     const el = document.getElementById('mc-' + k + '-cta-text');
-    if (el) el.textContent = 'Click to view details';
+    if (el) el.innerHTML = 'View Charts &amp; Details';
   });
   activeDetail = null;
 }
 
 function initCharts(key) {
-  if (key === 'v44') {
-    buildVersionAccChart('v44.x', 'c_v44_acc');
-    buildHardChart('v44.x', 'c_v44_hard');
-  } else if (key === 'v43') {
-    buildVersionAccChart('v43.x', 'c_v43_acc');
-  } else if (key === 'think') {
-    buildThinkingChart();
-  }
+  if (key === 'v44') { buildVersionAccChart('v44.x', 'c_v44_acc'); buildHardChart('v44.x', 'c_v44_hard'); }
+  else if (key === 'v43') { buildVersionAccChart('v43.x', 'c_v43_acc'); }
+  else if (key === 'think') { buildThinkingChart(); }
 }
 
 function populateDetailStats(key) {
   if (key === 'v44') {
     const rows = allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking');
-    const accs = rows.filter(r => r.accuracy !== null);
-    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
-    const hardRows = rows.filter(r => r.hardAcc !== null);
-    const bestH = hardRows.length ? hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
-    const datasets = [...new Set(rows.map(r => r.dataset))];
-    const models = [...new Set(rows.map(r => r.model).filter(Boolean))];
+    const bestA = rows.filter(r=>r.accuracy!==null).reduce((a,b)=>a.accuracy>b.accuracy?a:b,{accuracy:-1});
+    const hardRows = rows.filter(r=>r.hardAcc!==null);
+    const bestH = hardRows.length ? hardRows.reduce((a,b)=>a.hardAcc>b.hardAcc?a:b) : null;
+    const datasets = [...new Set(rows.map(r=>r.dataset))];
+    const models = [...new Set(rows.map(r=>r.model).filter(Boolean))];
     document.getElementById('ds-v44').innerHTML = `
-      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#38bdf8">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH ? bestH.hardAcc.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestH ? bestH.dataset+' · '+bestH.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#38bdf8">${bestA.accuracy>=0?bestA.accuracy.toFixed(1)+'%':'–'}</div><div class="dp-stat-sub">${bestA.accuracy>=0?bestA.dataset+' · '+bestA.date:''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH?bestH.hardAcc.toFixed(1)+'%':'–'}</div><div class="dp-stat-sub">${bestH?bestH.dataset+' · '+bestH.date:''}</div></div>
       <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">${datasets.length} datasets</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Models Used</div><div class="dp-stat-val" style="font-size:0.85rem;line-height:1.5;margin-top:6px">${models.join('<br>')}</div></div>
-    `;
+      <div class="dp-stat-card"><div class="dp-stat-label">Models Used</div><div class="dp-stat-val" style="font-size:0.85rem;line-height:1.5;margin-top:6px">${models.join('<br>')}</div></div>`;
   } else if (key === 'v43') {
     const rows = allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking');
-    const accs = rows.filter(r => r.accuracy !== null);
-    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
-    const hardRows = rows.filter(r => r.hardAcc !== null);
-    const bestH = hardRows.length ? hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
-    const datasets = [...new Set(rows.map(r => r.dataset))];
+    const bestA = rows.filter(r=>r.accuracy!==null).reduce((a,b)=>a.accuracy>b.accuracy?a:b,{accuracy:-1});
+    const hardRows = rows.filter(r=>r.hardAcc!==null);
+    const bestH = hardRows.length ? hardRows.reduce((a,b)=>a.hardAcc>b.hardAcc?a:b) : null;
+    const datasets = [...new Set(rows.map(r=>r.dataset))];
     document.getElementById('ds-v43').innerHTML = `
-      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#818cf8">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH ? bestH.hardAcc.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestH ? bestH.dataset+' · '+bestH.date : ''}</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">${datasets.length} datasets</div></div>
-    `;
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#818cf8">${bestA.accuracy>=0?bestA.accuracy.toFixed(1)+'%':'–'}</div><div class="dp-stat-sub">${bestA.accuracy>=0?bestA.dataset+' · '+bestA.date:''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH?bestH.hardAcc.toFixed(1)+'%':'–'}</div><div class="dp-stat-sub">${bestH?bestH.dataset+' · '+bestH.date:''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">${datasets.length} datasets</div></div>`;
   } else if (key === 'think') {
     const rows = allData.filter(r => r.model === 'thinking');
-    const accs = rows.filter(r => r.accuracy !== null);
-    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    const bestA = rows.filter(r=>r.accuracy!==null).reduce((a,b)=>a.accuracy>b.accuracy?a:b,{accuracy:-1});
     document.getElementById('ds-think').innerHTML = `
-      <div class="dp-stat-card"><div class="dp-stat-label">Accuracy</div><div class="dp-stat-val" style="color:#34d399">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">Dataset: revised_GD</div></div>
-    `;
+      <div class="dp-stat-card"><div class="dp-stat-label">Accuracy</div><div class="dp-stat-val" style="color:#34d399">${bestA.accuracy>=0?bestA.accuracy.toFixed(1)+'%':'–'}</div><div class="dp-stat-sub">${bestA.accuracy>=0?bestA.dataset+' · '+bestA.date:''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">Dataset: revised_GD</div></div>`;
   }
 }
 
 function populateMiniTable(key) {
   if (key === 'v44') {
-    const rows = [...allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
-    const tb = document.getElementById('mt-v44');
-    rows.forEach(r => {
+    [...allData.filter(r=>r.version==='v44.x'&&r.model!=='thinking')].sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
       const tr = document.createElement('tr');
-      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
-      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td><td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td><td>${r.model || '–'}</td>`;
-      tb.appendChild(tr);
+      const ac = r.accuracy>=60?'acc-high':r.accuracy>=40?'acc-mid':r.accuracy!==null?'acc-low':'';
+      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy!==null?r.accuracy.toFixed(2):'–'}</td><td>${r.hardAcc!==null?r.hardAcc.toFixed(1):'–'}</td><td>${r.precision!==null?r.precision.toFixed(1):'–'}</td><td>${r.avgTime!==null?r.avgTime.toFixed(2):'–'}</td><td>${r.model||'–'}</td>`;
+      document.getElementById('mt-v44').appendChild(tr);
     });
   } else if (key === 'v43') {
-    const rows = [...allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
-    const tb = document.getElementById('mt-v43');
-    rows.forEach(r => {
+    [...allData.filter(r=>r.version==='v43.x'&&r.model!=='thinking')].sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
       const tr = document.createElement('tr');
-      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
-      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td><td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>`;
-      tb.appendChild(tr);
+      const ac = r.accuracy>=60?'acc-high':r.accuracy>=40?'acc-mid':r.accuracy!==null?'acc-low':'';
+      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy!==null?r.accuracy.toFixed(2):'–'}</td><td>${r.hardAcc!==null?r.hardAcc.toFixed(1):'–'}</td><td>${r.precision!==null?r.precision.toFixed(1):'–'}</td><td>${r.avgTime!==null?r.avgTime.toFixed(2):'–'}</td>`;
+      document.getElementById('mt-v43').appendChild(tr);
     });
   } else if (key === 'think') {
-    const rows = [...allData.filter(r => r.model === 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
-    const tb = document.getElementById('mt-think');
-    rows.forEach(r => {
+    [...allData.filter(r=>r.model==='thinking')].sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
       const tr = document.createElement('tr');
-      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
-      tr.innerHTML = `<td>testing</td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>`;
-      tb.appendChild(tr);
+      const ac = r.accuracy>=60?'acc-high':r.accuracy>=40?'acc-mid':r.accuracy!==null?'acc-low':'';
+      tr.innerHTML = `<td>testing</td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy!==null?r.accuracy.toFixed(2):'–'}</td><td>${r.precision!==null?r.precision.toFixed(1):'–'}</td>`;
+      document.getElementById('mt-think').appendChild(tr);
     });
   }
 }
@@ -608,8 +613,7 @@ Chart.defaults.plugins.legend.labels.filter = item => !item.text.endsWith('(line
 
 function makeOptions(yLabel, labels) {
   return {
-    responsive: true,
-    maintainAspectRatio: false,
+    responsive: true, maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: {
@@ -630,20 +634,18 @@ function makeOptions(yLabel, labels) {
         filter: item => !item.dataset.label.endsWith('(line)'),
         callbacks: {
           title: items => items.length ? items[0].label : '',
-          label: item => ` ${item.dataset.label}: ${item.raw != null ? Number(item.raw).toFixed(2) : '–'}`
+          label: item => ` ${item.dataset.label}: ${item.raw!=null?Number(item.raw).toFixed(2):'–'}`
         }
       }
     },
     scales: {
       x: {
-        type: 'category',
-        labels: labels,
+        type: 'category', labels,
         ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 0, autoSkip: false },
         grid: { color: '#1e293b55' }
       },
       y: {
-        ticks: { color: '#94a3b8' },
-        grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' },
         title: { display: true, text: yLabel, color: '#94a3b8' }
       }
     }
@@ -654,85 +656,54 @@ function buildCategoryDatasets(groups, yField, labels) {
   const datasets = [];
   Object.entries(groups).forEach(([key, rows]) => {
     const lookup = {};
-    rows.filter(r => r[yField] !== null).forEach(r => {
-      if (lookup[r.date] === undefined || r[yField] > lookup[r.date]) lookup[r.date] = r[yField];
+    rows.filter(r=>r[yField]!==null).forEach(r => {
+      if (lookup[r.date]===undefined||r[yField]>lookup[r.date]) lookup[r.date]=r[yField];
     });
-    const data = labels.map(l => lookup[l] !== undefined ? lookup[l] : null);
+    const data = labels.map(l => lookup[l]!==undefined?lookup[l]:null);
     const col = dsColor(key);
-    datasets.push({
-      label: key, data,
-      borderColor: col, backgroundColor: col,
-      pointRadius: data.map(v => v !== null ? 6 : 0),
-      pointHoverRadius: data.map(v => v !== null ? 9 : 0),
-      showLine: false, spanGaps: false, order: 1,
-    });
-    datasets.push({
-      label: key + ' (line)', data,
-      borderColor: hexAlpha(col, 0.30), backgroundColor: 'transparent',
-      borderDash: [5, 6], borderWidth: 1.5, pointRadius: 0,
-      tension: 0.45, showLine: true, spanGaps: true, order: 2,
-    });
+    datasets.push({ label: key, data, borderColor: col, backgroundColor: col,
+      pointRadius: data.map(v=>v!==null?6:0), pointHoverRadius: data.map(v=>v!==null?9:0),
+      showLine: false, spanGaps: false, order: 1 });
+    datasets.push({ label: key+' (line)', data, borderColor: hexAlpha(col,0.30),
+      backgroundColor: 'transparent', borderDash: [5,6], borderWidth: 1.5,
+      pointRadius: 0, tension: 0.45, showLine: true, spanGaps: true, order: 2 });
   });
   return datasets;
 }
 
-function getLabels(rows) {
-  return [...new Set(rows.map(r => r.date))].sort();
-}
+function getLabels(rows) { return [...new Set(rows.map(r=>r.date))].sort(); }
 
 function buildThinkingChart() {
-  const rows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
-  const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
+  const rows = allData.filter(r=>r.model==='thinking'&&r.accuracy!==null);
   const groups = {};
-  dsNames.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
+  [...new Set(rows.map(r=>r.dataset))].sort().forEach(ds=>{ groups[ds]=rows.filter(r=>r.dataset===ds); });
   const labels = getLabels(rows);
-  new Chart(document.getElementById('c_think'), {
-    type: 'line',
-    data: { labels, datasets: buildCategoryDatasets(groups, 'accuracy', labels) },
-    options: makeOptions('Accuracy (%)', labels)
-  });
+  new Chart(document.getElementById('c_think'), { type:'line', data:{labels,datasets:buildCategoryDatasets(groups,'accuracy',labels)}, options:makeOptions('Accuracy (%)',labels) });
 }
 
 function buildVersionAccChart(version, canvasId) {
-  const rows = allData.filter(r => r.version === version && r.model !== 'thinking');
-  const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
+  const rows = allData.filter(r=>r.version===version&&r.model!=='thinking');
   const groups = {};
-  dsNames.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
+  [...new Set(rows.map(r=>r.dataset))].sort().forEach(ds=>{ groups[ds]=rows.filter(r=>r.dataset===ds); });
   const labels = getLabels(rows);
-  new Chart(document.getElementById(canvasId), {
-    type: 'line',
-    data: { labels, datasets: buildCategoryDatasets(groups, 'accuracy', labels) },
-    options: makeOptions('Accuracy (%)', labels)
-  });
+  new Chart(document.getElementById(canvasId), { type:'line', data:{labels,datasets:buildCategoryDatasets(groups,'accuracy',labels)}, options:makeOptions('Accuracy (%)',labels) });
 }
 
 function buildHardChart(version, canvasId) {
-  const rows = allData.filter(r => r.version === version && r.hardAcc !== null);
-  const groups = { [version + ' Hard Acc']: rows };
+  const rows = allData.filter(r=>r.version===version&&r.hardAcc!==null);
+  const groups = { [version+' Hard Acc']: rows };
   const labels = getLabels(rows);
-  new Chart(document.getElementById(canvasId), {
-    type: 'line',
-    data: { labels, datasets: buildCategoryDatasets(groups, 'hardAcc', labels) },
-    options: makeOptions('Hard Accuracy (%)', labels)
-  });
+  new Chart(document.getElementById(canvasId), { type:'line', data:{labels,datasets:buildCategoryDatasets(groups,'hardAcc',labels)}, options:makeOptions('Hard Accuracy (%)',labels) });
 }
 
 function renderTable() {
   const tb = document.getElementById('tableBody');
-  const sorted = [...allData].sort((a, b) => b.date.localeCompare(a.date));
-  sorted.forEach(r => {
+  [...allData].sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
     const tr = document.createElement('tr');
-    const accClass = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
-    const badgeClass = r.model === 'thinking' ? 'badge-thinking' : r.version === 'v44.x' ? 'badge-v44' : 'badge-v43';
-    const vLabel = r.model === 'thinking' ? 'thinking model' : r.version;
-    tr.innerHTML = `
-      <td><span class="badge ${badgeClass}">${vLabel}</span></td>
-      <td>${r.date}</td><td>${r.dataset}</td>
-      <td class="${accClass}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td>
-      <td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td>
-      <td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>
-      <td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>
-    `;
+    const ac = r.accuracy>=60?'acc-high':r.accuracy>=40?'acc-mid':r.accuracy!==null?'acc-low':'';
+    const bc = r.model==='thinking'?'badge-thinking':r.version==='v44.x'?'badge-v44':'badge-v43';
+    const vl = r.model==='thinking'?'thinking model':r.version;
+    tr.innerHTML = `<td><span class="badge ${bc}">${vl}</span></td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy!==null?r.accuracy.toFixed(2):'–'}</td><td>${r.hardAcc!==null?r.hardAcc.toFixed(1):'–'}</td><td>${r.precision!==null?r.precision.toFixed(1):'–'}</td><td>${r.avgTime!==null?r.avgTime.toFixed(2):'–'}</td>`;
     tb.appendChild(tr);
   });
 }
