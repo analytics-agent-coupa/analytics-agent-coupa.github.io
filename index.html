@@ -29,7 +29,6 @@
     header h1 { font-size: 1.6rem; font-weight: 700; }
     header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
 
-    /* Global KPIs */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 28px 40px 0; }
     .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; }
     .kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--accent)); }
@@ -38,7 +37,6 @@
     .kpi .sub { font-size: 0.73rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
     .kpi .sub .model-tag { display: inline-block; margin-top: 4px; background: rgba(52,211,153,0.15); color: var(--accent3); font-size: 0.7rem; font-weight: 600; padding: 1px 7px; border-radius: 4px; }
 
-    /* Production Accuracy */
     .prod-acc-wrap { padding: 24px 40px 0; }
     .prod-acc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: inline-block; min-width: 340px; }
     .prod-acc-card .card-header { background: linear-gradient(90deg, rgba(56,189,248,0.18) 0%, rgba(129,140,248,0.12) 100%); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 8px; }
@@ -49,7 +47,6 @@
     .prod-acc-card td { padding: 11px 20px; border-top: 1px solid var(--border); }
     .prod-acc-card td.acc-val { font-weight: 700; font-size: 1.05rem; color: var(--accent3); }
 
-    /* ===== 3 Model Cards ===== */
     .section-label { padding: 32px 40px 14px; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
     .model-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 40px; }
 
@@ -92,7 +89,6 @@
     .mc:hover .mc-cta .arrow { transform: translateX(4px); }
     .mc.active .mc-cta .arrow { transform: rotate(90deg); }
 
-    /* ===== Detail Panel ===== */
     .detail-panel {
       margin: 20px 40px 0;
       background: var(--surface);
@@ -136,7 +132,6 @@
     .mini-table-wrap .mth { padding: 12px 16px; font-size: 0.82rem; font-weight: 600; background: var(--surface2); border-bottom: 1px solid var(--border); }
     .mini-table-inner { overflow-x: auto; }
 
-    /* Global table */
     .table-section { padding: 28px 40px 40px; border-top: 1px solid var(--border); margin-top: 28px; }
     .table-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
     .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
@@ -175,7 +170,6 @@
   </div>
 </header>
 
-<!-- Global KPIs -->
 <div class="kpi-row">
   <div class="kpi" style="--kpi-color: var(--accent)">
     <div class="label">Best Accuracy</div>
@@ -194,7 +188,6 @@
   </div>
 </div>
 
-<!-- Production Accuracy -->
 <div class="prod-acc-wrap">
   <div class="prod-acc-card">
     <div class="card-header"><div class="dot"></div><span>Latest Production Accuracy</span></div>
@@ -208,16 +201,11 @@
   </div>
 </div>
 
-<!-- 3 Model Cards -->
 <div class="section-label">Explore by Model &mdash; Click a card to view charts &amp; details</div>
 <div class="model-cards">
 
-  <!-- v44.x -->
   <div class="mc" id="mc-v44" style="--mc-color: #38bdf8" onclick="toggleDetail('v44')">
-    <div class="mc-header">
-      <div class="mc-dot"></div>
-      <div class="mc-title">v44.x</div>
-    </div>
+    <div class="mc-header"><div class="mc-dot"></div><div class="mc-title">v44.x</div></div>
     <div class="mc-stat">
       <div class="mc-stat-label">Best Accuracy</div>
       <div class="mc-stat-value" id="mc-v44-acc">–</div>
@@ -234,12 +222,8 @@
     <div class="mc-cta"><span id="mc-v44-cta-text">Click to view details</span> <span class="arrow">›</span></div>
   </div>
 
-  <!-- v43.x -->
   <div class="mc" id="mc-v43" style="--mc-color: #818cf8" onclick="toggleDetail('v43')">
-    <div class="mc-header">
-      <div class="mc-dot"></div>
-      <div class="mc-title">v43.x</div>
-    </div>
+    <div class="mc-header"><div class="mc-dot"></div><div class="mc-title">v43.x</div></div>
     <div class="mc-stat">
       <div class="mc-stat-label">Best Accuracy</div>
       <div class="mc-stat-value" id="mc-v43-acc">–</div>
@@ -256,12 +240,8 @@
     <div class="mc-cta"><span id="mc-v43-cta-text">Click to view details</span> <span class="arrow">›</span></div>
   </div>
 
-  <!-- Thinking Model -->
   <div class="mc" id="mc-think" style="--mc-color: #34d399" onclick="toggleDetail('think')">
-    <div class="mc-header">
-      <div class="mc-dot"></div>
-      <div class="mc-title">🧠 Thinking Model</div>
-    </div>
+    <div class="mc-header"><div class="mc-dot"></div><div class="mc-title">🧠 Thinking Model</div></div>
     <div class="mc-stat">
       <div class="mc-stat-label">Accuracy on revised_GD</div>
       <div class="mc-stat-value" id="mc-think-acc">–</div>
@@ -273,14 +253,12 @@
 
 </div>
 
-<!-- Detail Panel (single expandable panel below cards) -->
 <div class="detail-panel" id="detailPanel">
   <div class="dp-header" id="dpHeader">
     <h2 id="dpTitle">–</h2>
     <div class="dp-close" onclick="closeDetail()">&#x2715;</div>
   </div>
 
-  <!-- v44 detail section -->
   <div id="detail-v44" class="detail-section" style="display:none">
     <div class="dp-body">
       <div class="dp-stats" id="ds-v44"></div>
@@ -308,7 +286,6 @@
     </div>
   </div>
 
-  <!-- v43 detail section -->
   <div id="detail-v43" class="detail-section" style="display:none">
     <div class="dp-body">
       <div class="dp-stats" id="ds-v43"></div>
@@ -331,14 +308,13 @@
     </div>
   </div>
 
-  <!-- Thinking detail section -->
   <div id="detail-think" class="detail-section" style="display:none">
     <div class="dp-body">
       <div class="dp-stats" id="ds-think"></div>
       <div class="dp-charts">
         <div class="chart-card">
           <h3>Thinking Model – Accuracy on revised_GD</h3>
-          <p class="hint">All thinking model evaluations across versions</p>
+          <p class="hint">All thinking model evaluations</p>
           <canvas id="c_think"></canvas>
         </div>
       </div>
@@ -346,7 +322,7 @@
         <div class="mth">Thinking Model Runs</div>
         <div class="mini-table-inner">
           <table>
-            <thead><tr><th>Version</th><th>Date</th><th>Dataset</th><th>Accuracy (%)</th><th>Precision (%)</th></tr></thead>
+            <thead><tr><th>Testing</th><th>Date</th><th>Dataset</th><th>Accuracy (%)</th><th>Precision (%)</th></tr></thead>
             <tbody id="mt-think"></tbody>
           </table>
         </div>
@@ -355,7 +331,6 @@
   </div>
 </div>
 
-<!-- Global Table -->
 <div class="table-section">
   <h3>All Evaluation Runs</h3>
   <div class="tbl-wrap">
@@ -488,15 +463,14 @@ function populateCards() {
       `${v43rows.length} runs · ${dates[0]} to ${dates[dates.length-1]}`;
   }
 
-  // thinking
+  // thinking — no version reference
   const thinkRows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
   if (thinkRows.length) {
     const bestA = thinkRows.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
     document.getElementById('mc-think-acc').textContent = bestA.accuracy.toFixed(1) + '%';
     document.getElementById('mc-think-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
-    const versions = [...new Set(allData.filter(r => r.model === 'thinking').map(r => r.version))];
     document.getElementById('mc-think-meta').textContent =
-      `${thinkRows.length} runs · Evaluated on: ${versions.join(', ')}`;
+      `${thinkRows.length} runs · Dataset: revised_GD`;
   }
 }
 
@@ -505,14 +479,12 @@ function toggleDetail(key) {
     closeDetail();
     return;
   }
-  // Deactivate all
   document.querySelectorAll('.mc').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.detail-section').forEach(s => s.style.display = 'none');
   ['v44','v43','think'].forEach(k => {
     const el = document.getElementById('mc-' + k + '-cta-text');
     if (el) el.textContent = 'Click to view details';
   });
-  // Activate
   document.getElementById('mc-' + key).classList.add('active');
   document.getElementById('mc-' + key + '-cta-text').textContent = 'Collapse';
   document.getElementById('detail-' + key).style.display = 'block';
@@ -594,11 +566,9 @@ function populateDetailStats(key) {
     const rows = allData.filter(r => r.model === 'thinking');
     const accs = rows.filter(r => r.accuracy !== null);
     const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
-    const versions = [...new Set(rows.map(r => r.version))];
     document.getElementById('ds-think').innerHTML = `
       <div class="dp-stat-card"><div class="dp-stat-label">Accuracy</div><div class="dp-stat-val" style="color:#34d399">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">Across all versions</div></div>
-      <div class="dp-stat-card"><div class="dp-stat-label">Versions Tested</div><div class="dp-stat-val" style="font-size:0.85rem;line-height:1.5;margin-top:6px">${versions.join('<br>')}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">Dataset: revised_GD</div></div>
     `;
   }
 }
@@ -628,13 +598,12 @@ function populateMiniTable(key) {
     rows.forEach(r => {
       const tr = document.createElement('tr');
       const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
-      tr.innerHTML = `<td>${r.version}</td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>`;
+      tr.innerHTML = `<td>testing</td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>`;
       tb.appendChild(tr);
     });
   }
 }
 
-// Hide "(line)" from legend globally
 Chart.defaults.plugins.legend.labels.filter = item => !item.text.endsWith('(line)');
 
 function makeOptions(yLabel, labels) {
