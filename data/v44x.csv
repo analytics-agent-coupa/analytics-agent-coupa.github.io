@@ -1,26 +1,26 @@
 Version,Date,Dataset,Accuracy,Avg_Time_per_Query,GPT_Model,Hard_Accuracy,Precision
-v44.x,2025-07-16,Golden Data,56.40,23.62,gpt-4o-mini,,
-v44.x,2025-07-16,Synthetic Data,26.53,23.50,gpt-4o-mini,,
-v44.x,2025-07-16,QE Test Data,33.93,25.10,gpt-4o-mini,,
-v44.x,2025-07-18,Golden Data,61.54,23.63,gpt-4o-mini,,
-v44.x,2025-07-18,Synthetic Data,22.76,23.20,gpt-4o-mini,,
-v44.x,2025-07-18,QE Test Data,38.42,24.20,gpt-4o-mini,,
-v44.x,2025-07-29,Golden Data,59.88,23.20,gpt-4o-mini,,
-v44.x,2025-07-29,Synthetic Data,24.15,23.50,gpt-4o-mini,,
-v44.x,2025-07-29,QE Test Data,39.07,24.30,gpt-4o-mini,,
-v44.x,2025-07-16,Golden Data,61.50,22.90,gpt-4.1-mini,,
-v44.x,2025-07-16,Synthetic Data,27.80,22.77,gpt-4.1-mini,,
-v44.x,2025-07-16,QE Test Data,39.45,23.62,gpt-4.1-mini,,
-v44.x,2025-07-18,Golden Data,60.40,22.66,gpt-4.1-mini,,
-v44.x,2025-07-18,Synthetic Data,27.40,22.82,gpt-4.1-mini,,
-v44.x,2025-07-18,QE Test Data,41.40,23.55,gpt-4.1-mini,,
-v44.x,2025-07-29,Golden Data,60.40,22.63,gpt-4.1-mini,,
-v44.x,2025-07-29,Synthetic Data,25.30,23.30,gpt-4.1-mini,,
-v44.x,2025-07-29,QE Test Data,36.20,24.20,gpt-4.1-mini,,
-v44.x,2025-10-08,Golden Data,58.30,,gpt-4o-mini,,
-v44.x,2025-10-08,Staging Data,78.43,,gpt-4o-mini,,
-v44.x,2025-10-10,revised_GD,55.80,,gpt-4o-mini,,
-v44.x,2025-10-15,revised_GD,62.40,,gpt-4o-mini,,
-v44.x,2025-10-16,revised_GD,63.80,,gpt-4o-mini,55,
-v44.x,2026-02-12,revised_GD,68.50,,gpt-4o-mini,58.2,
-v44.x,2026-05-14,revised_GD,85.00,,thinking,,
+v44.x,2025-07-16,Golden Data,56.40,23.62,gpt-4o-mini,,40
+v44.x,2025-07-16,Synthetic Data,26.53,23.50,gpt-4o-mini,,40
+v44.x,2025-07-16,QE Test Data,33.93,25.10,gpt-4o-mini,,40
+v44.x,2025-07-18,Golden Data,61.54,23.63,gpt-4o-mini,,40
+v44.x,2025-07-18,Synthetic Data,22.76,23.20,gpt-4o-mini,,40
+v44.x,2025-07-18,QE Test Data,38.42,24.20,gpt-4o-mini,,40
+v44.x,2025-07-29,Golden Data,59.88,23.20,gpt-4o-mini,,40
+v44.x,2025-07-29,Synthetic Data,24.15,23.50,gpt-4o-mini,,40
+v44.x,2025-07-29,QE Test Data,39.07,24.30,gpt-4o-mini,,40
+v44.x,2025-07-16,Golden Data,61.50,22.90,gpt-4.1-mini,,40
+v44.x,2025-07-16,Synthetic Data,27.80,22.77,gpt-4.1-mini,,40
+v44.x,2025-07-16,QE Test Data,39.45,23.62,gpt-4.1-mini,,40
+v44.x,2025-07-18,Golden Data,60.40,22.66,gpt-4.1-mini,,40
+v44.x,2025-07-18,Synthetic Data,27.40,22.82,gpt-4.1-mini,,40
+v44.x,2025-07-18,QE Test Data,41.40,23.55,gpt-4.1-mini,,40
+v44.x,2025-07-29,Golden Data,60.40,22.63,gpt-4.1-mini,,40
+v44.x,2025-07-29,Synthetic Data,25.30,23.30,gpt-4.1-mini,,40
+v44.x,2025-07-29,QE Test Data,36.20,24.20,gpt-4.1-mini,,40
+v44.x,2025-10-08,Golden Data,58.30,,gpt-4o-mini,,40
+v44.x,2025-10-08,Staging Data,78.43,,gpt-4o-mini,,40
+v44.x,2025-10-10,revised_GD,55.80,,gpt-4o-mini,,40
+v44.x,2025-10-15,revised_GD,62.40,,gpt-4o-mini,,40
+v44.x,2025-10-16,revised_GD,63.80,,gpt-4o-mini,55,40
+v44.x,2026-02-12,revised_GD,68.50,,gpt-4o-mini,58.2,63
+v44.x,2026-05-14,revised_GD,85.00,,thinking,,63
