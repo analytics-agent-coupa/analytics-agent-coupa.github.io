@@ -86,17 +86,13 @@
     .pill-v43  { background: rgba(129,140,248,0.15); color: var(--accent2); }
     .pill-think { background: rgba(52,211,153,0.15); color: var(--accent3); }
 
-    /* Single-column chart rows */
     .chart-row { padding: 16px 40px; display: flex; flex-direction: column; gap: 20px; }
-
-    /* Two-column chart row (side by side, each half width) */
     .chart-row-2col {
       padding: 16px 40px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-
     .chart-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 24px 28px; width: 100%;
@@ -124,9 +120,7 @@
 
     footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
 
-    @media (max-width: 900px) {
-      .chart-row-2col { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .chart-row-2col { grid-template-columns: 1fr; } }
     @media (max-width: 700px) {
       header, .kpi-row, .prod-acc-wrap, .section-title, .chart-row, .chart-row-2col, .table-section { padding-left: 16px; padding-right: 16px; }
       .prod-acc-card { min-width: 0; width: 100%; }
@@ -161,7 +155,6 @@
   </div>
 </div>
 
-<!-- Latest Production Accuracy -->
 <div class="prod-acc-wrap">
   <div class="prod-acc-card">
     <div class="card-header">
@@ -178,7 +171,6 @@
   </div>
 </div>
 
-<!-- Thinking Model Section -->
 <div class="section-title">
   <span>🧠 Thinking Model</span>
   <span class="pill pill-think">thinking</span>
@@ -196,7 +188,6 @@
   </div>
 </div>
 
-<!-- v44.x -->
 <div class="section-title">
   <span>v44.x</span><span class="pill pill-v44">v44.x</span>
 </div>
@@ -213,7 +204,6 @@
   </div>
 </div>
 
-<!-- v43.x -->
 <div class="section-title">
   <span>v43.x</span><span class="pill pill-v43">v43.x</span>
 </div>
@@ -225,7 +215,6 @@
   </div>
 </div>
 
-<!-- Avg Time -->
 <div class="section-title" style="border-top: none; margin-top: 8px;">
   <span>Avg Time per Query</span>
 </div>
@@ -237,7 +226,6 @@
   </div>
 </div>
 
-<!-- Table -->
 <div class="table-section">
   <h3>All Evaluation Runs</h3>
   <div class="table-wrap">
@@ -312,7 +300,6 @@ function renderKPIs() {
   const bestHard = hards.length ? hards.reduce((a, b) => a.hardAcc > b.hardAcc ? a : b) : null;
 
   document.getElementById('kpiBest').textContent = best.accuracy.toFixed(1) + '%';
-  // Show dataset · date, then model tag on new line if present
   const modelTag = best.model ? `<span class="model-tag">🧠 ${best.model}</span>` : '';
   document.getElementById('kpiBestSub').innerHTML =
     `${best.dataset} &nbsp;&middot;&nbsp; ${best.date}${modelTag ? '<br>' + modelTag : ''}`;
@@ -328,14 +315,14 @@ function renderKPIs() {
   }
 }
 
-// Hide "(line)" from legend globally
 Chart.defaults.plugins.legend.labels.filter = item => !item.text.endsWith('(line)');
 
-function makeOptions(yLabel, allPts) {
-  const dates = allPts.map(p => new Date(p.x).getTime()).filter(t => !isNaN(t));
-  const pad = 15 * 24 * 3600 * 1000;
-  const xMin = dates.length ? new Date(Math.min(...dates) - pad) : undefined;
-  const xMax = dates.length ? new Date(Math.max(...dates) + pad) : undefined;
+// Build options using only the actual data dates for the x-axis ticks.
+// bounds:'data' + ticks.source:'data' ensures no empty time gaps are shown.
+function makeOptions(yLabel, pts) {
+  // Collect all unique date strings from the actual data points
+  const uniqueDates = [...new Set(pts.map(p => p.x).filter(Boolean))].sort();
+
   return {
     responsive: true, maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
@@ -370,12 +357,23 @@ function makeOptions(yLabel, allPts) {
     },
     scales: {
       x: {
-        type: 'time', min: xMin, max: xMax,
-        time: { unit: 'month', displayFormats: { month: 'MMM yyyy' } },
-        ticks: { color: '#94a3b8', maxRotation: 0 }, grid: { color: '#1e293b55' }
+        type: 'time',
+        // Only tick at dates where we actually have data
+        bounds: 'data',
+        time: { displayFormats: { day: 'MMM d', month: 'MMM yyyy', year: 'yyyy' } },
+        ticks: {
+          source: 'data',       // ticks only at real data points — no empty gaps
+          color: '#94a3b8',
+          maxRotation: 45,
+          minRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 12,
+        },
+        grid: { color: '#1e293b55' }
       },
       y: {
-        ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8' },
+        grid: { color: '#1e293b' },
         title: { display: true, text: yLabel, color: '#94a3b8' }
       }
     }
@@ -403,32 +401,24 @@ function dottedLineDatasets(groups, yField) {
   return datasets;
 }
 
+// Collect all data points (x values) across all groups for a given field
 function allPointsFromGroups(groups, yField) {
   return Object.values(groups).flat().filter(r => r[yField] !== null).map(r => ({ x: r.date }));
 }
 
 function buildThinkingChart(version, canvasId) {
   const rows = allData.filter(r => r.version === version && r.model === 'thinking' && r.accuracy !== null);
-  // Group by dataset
   const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
   const groups = {};
   dsNames.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
-  const allPts = rows.map(r => ({ x: r.date }));
-
-  // If no data, show empty state
-  if (!rows.length) {
-    allPts.push({ x: '2026-05-14' }); // placeholder so axis renders
-  }
-
   new Chart(document.getElementById(canvasId), {
     type: 'scatter',
     data: { datasets: rows.length ? dottedLineDatasets(groups, 'accuracy') : [] },
-    options: makeOptions('Accuracy (%)', allPts)
+    options: makeOptions('Accuracy (%)', rows.map(r => ({ x: r.date })))
   });
 }
 
 function buildVersionAccChart(version, canvasId) {
-  // Exclude thinking model rows from the main accuracy charts
   const rows = allData.filter(r => r.version === version && r.model !== 'thinking');
   const datasets = [...new Set(rows.map(r => r.dataset))].sort();
   const groups = {};
