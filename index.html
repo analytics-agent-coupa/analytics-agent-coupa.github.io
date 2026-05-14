@@ -28,6 +28,8 @@
     }
     header h1 { font-size: 1.6rem; font-weight: 700; }
     header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+    /* Global KPIs */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 28px 40px 0; }
     .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; }
     .kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--accent)); }
@@ -35,6 +37,8 @@
     .kpi .value { font-size: 1.9rem; font-weight: 700; margin-top: 6px; color: var(--kpi-color, var(--accent)); }
     .kpi .sub { font-size: 0.73rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
     .kpi .sub .model-tag { display: inline-block; margin-top: 4px; background: rgba(52,211,153,0.15); color: var(--accent3); font-size: 0.7rem; font-weight: 600; padding: 1px 7px; border-radius: 4px; }
+
+    /* Production Accuracy */
     .prod-acc-wrap { padding: 24px 40px 0; }
     .prod-acc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: inline-block; min-width: 340px; }
     .prod-acc-card .card-header { background: linear-gradient(90deg, rgba(56,189,248,0.18) 0%, rgba(129,140,248,0.12) 100%); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 8px; }
@@ -44,19 +48,98 @@
     .prod-acc-card th { padding: 10px 20px; text-align: left; color: var(--muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; background: var(--surface2); }
     .prod-acc-card td { padding: 11px 20px; border-top: 1px solid var(--border); }
     .prod-acc-card td.acc-val { font-weight: 700; font-size: 1.05rem; color: var(--accent3); }
-    .section-title { padding: 32px 40px 0; font-size: 1.1rem; font-weight: 700; color: var(--text); border-top: 1px solid var(--border); margin-top: 28px; display: flex; align-items: center; gap: 10px; }
-    .section-title .pill { font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-    .pill-v44   { background: rgba(56,189,248,0.15); color: var(--accent); }
-    .pill-v43   { background: rgba(129,140,248,0.15); color: var(--accent2); }
-    .pill-think { background: rgba(52,211,153,0.15); color: var(--accent3); }
-    .chart-row { padding: 16px 40px; display: flex; flex-direction: column; gap: 20px; }
-    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; width: 100%; }
-    .chart-card h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
-    .chart-card .hint { font-size: 0.73rem; color: var(--muted); margin-bottom: 18px; }
-    .chart-card canvas { height: 300px !important; width: 100% !important; }
-    .table-section { padding: 28px 40px 40px; border-top: 1px solid var(--border); margin-top: 12px; }
+
+    /* ===== 3 Model Cards ===== */
+    .section-label { padding: 32px 40px 14px; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .model-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 40px; }
+
+    .mc {
+      background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius);
+      padding: 24px; cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      user-select: none;
+    }
+    .mc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--mc-color, var(--accent)); }
+    .mc:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.4); }
+    .mc.active {
+      border-color: var(--mc-color, var(--accent));
+      box-shadow: 0 0 0 1px var(--mc-color, var(--accent)), 0 10px 32px rgba(0,0,0,0.4);
+    }
+
+    .mc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .mc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--mc-color, var(--accent)); flex-shrink: 0; }
+    .mc-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+
+    .mc-stat { margin-bottom: 14px; }
+    .mc-stat-label { font-size: 0.69rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+    .mc-stat-value { font-size: 1.8rem; font-weight: 700; color: var(--mc-color, var(--accent)); line-height: 1.1; }
+    .mc-stat-sub { font-size: 0.71rem; color: var(--muted); margin-top: 3px; }
+
+    .mc-secondary { display: flex; gap: 20px; margin-bottom: 12px; }
+    .mc-sec-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .mc-sec-value { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-top: 2px; }
+    .mc-sec-sub { font-size: 0.68rem; color: var(--muted); }
+
+    .mc-meta { font-size: 0.72rem; color: var(--muted); padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; }
+
+    .mc-cta {
+      margin-top: 16px; display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; font-weight: 600; color: var(--mc-color, var(--accent));
+      opacity: 0.85;
+    }
+    .mc-cta .arrow { transition: transform 0.18s; display: inline-block; }
+    .mc:hover .mc-cta { opacity: 1; }
+    .mc:hover .mc-cta .arrow { transform: translateX(4px); }
+    .mc.active .mc-cta .arrow { transform: rotate(90deg); }
+
+    /* ===== Detail Panel ===== */
+    .detail-panel {
+      margin: 20px 40px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: none;
+    }
+    .detail-panel.open { display: block; animation: slideDown 0.22s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .dp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dp-header h2 { font-size: 1rem; font-weight: 700; }
+    .dp-close {
+      width: 28px; height: 28px; border-radius: 6px; background: var(--surface2);
+      border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .dp-close:hover { background: var(--border); color: var(--text); }
+
+    .dp-body { padding: 24px; }
+
+    .dp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .dp-stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .dp-stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+    .dp-stat-val { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+    .dp-stat-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    .dp-charts { display: flex; flex-direction: column; gap: 20px; }
+    .chart-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+    .chart-card h3 { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .chart-card .hint { font-size: 0.71rem; color: var(--muted); margin-bottom: 16px; }
+    .chart-card canvas { height: 280px !important; width: 100% !important; }
+
+    .mini-table-wrap { margin-top: 24px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+    .mini-table-wrap .mth { padding: 12px 16px; font-size: 0.82rem; font-weight: 600; background: var(--surface2); border-bottom: 1px solid var(--border); }
+    .mini-table-inner { overflow-x: auto; }
+
+    /* Global table */
+    .table-section { padding: 28px 40px 40px; border-top: 1px solid var(--border); margin-top: 28px; }
     .table-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
-    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     thead tr { background: var(--surface2); }
     th { padding: 12px 16px; text-align: left; color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
@@ -64,15 +147,20 @@
     tbody tr:hover { background: var(--surface2); }
     td { padding: 10px 16px; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.73rem; font-weight: 600; }
-    .badge-v44 { background: rgba(56,189,248,0.15); color: var(--accent); }
-    .badge-v43 { background: rgba(129,140,248,0.15); color: var(--accent2); }
-    .badge-thinking { background: rgba(52,211,153,0.15); color: var(--accent3); }
-    .acc-high { color: var(--accent3); font-weight: 600; }
-    .acc-mid  { color: var(--accent4); font-weight: 600; }
+    .badge-v44 { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .badge-v43 { background: rgba(129,140,248,0.15); color: #818cf8; }
+    .badge-thinking { background: rgba(52,211,153,0.15); color: #34d399; }
+    .acc-high { color: #34d399; font-weight: 600; }
+    .acc-mid  { color: #fb923c; font-weight: 600; }
     .acc-low  { color: #f87171; font-weight: 600; }
+
     footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
+
+    @media (max-width: 900px) { .model-cards { grid-template-columns: 1fr; } }
     @media (max-width: 700px) {
-      header, .kpi-row, .prod-acc-wrap, .section-title, .chart-row, .table-section { padding-left: 16px; padding-right: 16px; }
+      header, .kpi-row, .prod-acc-wrap, .section-label, .model-cards, .table-section { padding-left: 16px; padding-right: 16px; }
+      .model-cards { padding: 0 16px; }
+      .detail-panel { margin: 16px 16px 0; }
       .prod-acc-card { min-width: 0; width: 100%; }
     }
   </style>
@@ -83,10 +171,11 @@
   <div class="logo">A</div>
   <div>
     <h1>Analytics Agent &ndash; Model Performance Dashboard</h1>
-    <p>Coupa AI &bull; Evaluation Metrics Tracker &bull; Click legend labels to toggle datasets</p>
+    <p>Coupa AI &bull; Evaluation Metrics Tracker &bull; Click a model card to explore details</p>
   </div>
 </header>
 
+<!-- Global KPIs -->
 <div class="kpi-row">
   <div class="kpi" style="--kpi-color: var(--accent)">
     <div class="label">Best Accuracy</div>
@@ -105,6 +194,7 @@
   </div>
 </div>
 
+<!-- Production Accuracy -->
 <div class="prod-acc-wrap">
   <div class="prod-acc-card">
     <div class="card-header"><div class="dot"></div><span>Latest Production Accuracy</span></div>
@@ -118,64 +208,157 @@
   </div>
 </div>
 
-<!-- Thinking Model -->
-<div class="section-title">
-  <span>🧠 Thinking Model</span>
-  <span class="pill pill-think">thinking</span>
+<!-- 3 Model Cards -->
+<div class="section-label">Explore by Model &mdash; Click a card to view charts &amp; details</div>
+<div class="model-cards">
+
+  <!-- v44.x -->
+  <div class="mc" id="mc-v44" style="--mc-color: #38bdf8" onclick="toggleDetail('v44')">
+    <div class="mc-header">
+      <div class="mc-dot"></div>
+      <div class="mc-title">v44.x</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">Best Accuracy</div>
+      <div class="mc-stat-value" id="mc-v44-acc">–</div>
+      <div class="mc-stat-sub" id="mc-v44-acc-sub">–</div>
+    </div>
+    <div class="mc-secondary">
+      <div class="mc-sec-item">
+        <div class="mc-sec-label">Best Hard Acc</div>
+        <div class="mc-sec-value" id="mc-v44-hard">–</div>
+        <div class="mc-sec-sub" id="mc-v44-hard-sub">–</div>
+      </div>
+    </div>
+    <div class="mc-meta" id="mc-v44-meta">–</div>
+    <div class="mc-cta"><span id="mc-v44-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+  </div>
+
+  <!-- v43.x -->
+  <div class="mc" id="mc-v43" style="--mc-color: #818cf8" onclick="toggleDetail('v43')">
+    <div class="mc-header">
+      <div class="mc-dot"></div>
+      <div class="mc-title">v43.x</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">Best Accuracy</div>
+      <div class="mc-stat-value" id="mc-v43-acc">–</div>
+      <div class="mc-stat-sub" id="mc-v43-acc-sub">–</div>
+    </div>
+    <div class="mc-secondary">
+      <div class="mc-sec-item">
+        <div class="mc-sec-label">Best Hard Acc</div>
+        <div class="mc-sec-value" id="mc-v43-hard">–</div>
+        <div class="mc-sec-sub" id="mc-v43-hard-sub">–</div>
+      </div>
+    </div>
+    <div class="mc-meta" id="mc-v43-meta">–</div>
+    <div class="mc-cta"><span id="mc-v43-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+  </div>
+
+  <!-- Thinking Model -->
+  <div class="mc" id="mc-think" style="--mc-color: #34d399" onclick="toggleDetail('think')">
+    <div class="mc-header">
+      <div class="mc-dot"></div>
+      <div class="mc-title">🧠 Thinking Model</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">Accuracy on revised_GD</div>
+      <div class="mc-stat-value" id="mc-think-acc">–</div>
+      <div class="mc-stat-sub" id="mc-think-acc-sub">–</div>
+    </div>
+    <div class="mc-meta" id="mc-think-meta">–</div>
+    <div class="mc-cta"><span id="mc-think-cta-text">Click to view details</span> <span class="arrow">›</span></div>
+  </div>
+
 </div>
-<div class="chart-row">
-  <div class="chart-card">
-    <h3>Thinking Model – Accuracy Over Time</h3>
-    <p class="hint">All thinking model runs on revised_GD dataset &nbsp;|&nbsp; Click legend to toggle</p>
-    <canvas id="c_think"></canvas>
+
+<!-- Detail Panel (single expandable panel below cards) -->
+<div class="detail-panel" id="detailPanel">
+  <div class="dp-header" id="dpHeader">
+    <h2 id="dpTitle">–</h2>
+    <div class="dp-close" onclick="closeDetail()">&#x2715;</div>
+  </div>
+
+  <!-- v44 detail section -->
+  <div id="detail-v44" class="detail-section" style="display:none">
+    <div class="dp-body">
+      <div class="dp-stats" id="ds-v44"></div>
+      <div class="dp-charts">
+        <div class="chart-card">
+          <h3>Accuracy Over Time by Dataset</h3>
+          <p class="hint">Each point equally spaced · Faint dotted line = trend · Click legend to toggle</p>
+          <canvas id="c_v44_acc"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Hard Accuracy Over Time</h3>
+          <p class="hint">Only rows with hard accuracy data shown</p>
+          <canvas id="c_v44_hard"></canvas>
+        </div>
+      </div>
+      <div class="mini-table-wrap">
+        <div class="mth">v44.x Evaluation Runs</div>
+        <div class="mini-table-inner">
+          <table>
+            <thead><tr><th>Date</th><th>Dataset</th><th>Accuracy (%)</th><th>Hard Acc (%)</th><th>Precision (%)</th><th>Avg Time (s)</th><th>Model</th></tr></thead>
+            <tbody id="mt-v44"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- v43 detail section -->
+  <div id="detail-v43" class="detail-section" style="display:none">
+    <div class="dp-body">
+      <div class="dp-stats" id="ds-v43"></div>
+      <div class="dp-charts">
+        <div class="chart-card">
+          <h3>Accuracy Over Time by Dataset</h3>
+          <p class="hint">Each point equally spaced · Faint dotted line = trend · Click legend to toggle</p>
+          <canvas id="c_v43_acc"></canvas>
+        </div>
+      </div>
+      <div class="mini-table-wrap">
+        <div class="mth">v43.x Evaluation Runs</div>
+        <div class="mini-table-inner">
+          <table>
+            <thead><tr><th>Date</th><th>Dataset</th><th>Accuracy (%)</th><th>Hard Acc (%)</th><th>Precision (%)</th><th>Avg Time (s)</th></tr></thead>
+            <tbody id="mt-v43"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thinking detail section -->
+  <div id="detail-think" class="detail-section" style="display:none">
+    <div class="dp-body">
+      <div class="dp-stats" id="ds-think"></div>
+      <div class="dp-charts">
+        <div class="chart-card">
+          <h3>Thinking Model – Accuracy on revised_GD</h3>
+          <p class="hint">All thinking model evaluations across versions</p>
+          <canvas id="c_think"></canvas>
+        </div>
+      </div>
+      <div class="mini-table-wrap">
+        <div class="mth">Thinking Model Runs</div>
+        <div class="mini-table-inner">
+          <table>
+            <thead><tr><th>Version</th><th>Date</th><th>Dataset</th><th>Accuracy (%)</th><th>Precision (%)</th></tr></thead>
+            <tbody id="mt-think"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- v44.x -->
-<div class="section-title">
-  <span>v44.x</span><span class="pill pill-v44">v44.x</span>
-</div>
-<div class="chart-row">
-  <div class="chart-card">
-    <h3>v44.x – Accuracy Over Time by Dataset</h3>
-    <p class="hint">Each point equally spaced &nbsp;|&nbsp; Faint dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
-    <canvas id="c_v44_acc"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>v44.x – Hard Accuracy Over Time</h3>
-    <p class="hint">Click legend to toggle</p>
-    <canvas id="c_v44_hard"></canvas>
-  </div>
-</div>
-
-<!-- v43.x -->
-<div class="section-title">
-  <span>v43.x</span><span class="pill pill-v43">v43.x</span>
-</div>
-<div class="chart-row">
-  <div class="chart-card">
-    <h3>v43.x – Accuracy Over Time by Dataset</h3>
-    <p class="hint">Each point equally spaced &nbsp;|&nbsp; Faint dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
-    <canvas id="c_v43_acc"></canvas>
-  </div>
-</div>
-
-<!-- Avg Time -->
-<div class="section-title" style="border-top: none; margin-top: 8px;">
-  <span>Avg Time per Query</span>
-</div>
-<div class="chart-row">
-  <div class="chart-card">
-    <h3>Avg Time per Query – by Dataset (All Versions)</h3>
-    <p class="hint">Click legend to toggle datasets</p>
-    <canvas id="c_time"></canvas>
-  </div>
-</div>
-
-<!-- Table -->
+<!-- Global Table -->
 <div class="table-section">
   <h3>All Evaluation Runs</h3>
-  <div class="table-wrap">
+  <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
@@ -196,6 +379,8 @@
 <script>
 const FILES = ['data/v44x.csv', 'data/v43x.csv'];
 let allData = [];
+const chartInitialized = {};
+let activeDetail = null;
 
 const DS_COLORS = [
   '#38bdf8','#818cf8','#34d399','#fb923c',
@@ -226,13 +411,8 @@ async function loadAll() {
     hardAcc:   parseFloat(r.Hard_Accuracy) || null,
     precision: parseFloat(r.Precision) || null,
   }));
-
   renderKPIs();
-  buildThinkingChart();
-  buildVersionAccChart('v44.x', 'c_v44_acc');
-  buildHardChart('v44.x', 'c_v44_hard');
-  buildVersionAccChart('v43.x', 'c_v43_acc');
-  buildTimeChart();
+  populateCards();
   renderTable();
   document.getElementById('lastUpdated').textContent =
     new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -252,9 +432,8 @@ function renderKPIs() {
 
   document.getElementById('kpiBest').textContent = best.accuracy.toFixed(1) + '%';
   const mLabel = modelLabel(best);
-  const modelTag = mLabel ? `<span class="model-tag">${mLabel}</span>` : '';
   document.getElementById('kpiBestSub').innerHTML =
-    `${best.dataset} &nbsp;&middot;&nbsp; ${best.date}${modelTag ? '<br>' + modelTag : ''}`;
+    `${best.dataset} &nbsp;&middot;&nbsp; ${best.date}${mLabel ? '<br><span class="model-tag">' + mLabel + '</span>' : ''}`;
 
   document.getElementById('kpiRuns').textContent = allData.length;
   document.getElementById('kpiRunsSub').textContent = [...new Set(allData.map(d => d.version))].join(', ');
@@ -262,17 +441,202 @@ function renderKPIs() {
   if (bestHard) {
     document.getElementById('kpiHard').textContent = bestHard.hardAcc.toFixed(1) + '%';
     const timePart = bestHard.avgTime !== null ? ` · ${bestHard.avgTime.toFixed(2)}s` : '';
-    const hardMLabel = modelLabel(bestHard);
-    const hardModelTag = hardMLabel ? `<br><span class="model-tag">${hardMLabel}</span>` : '';
+    const hLabel = modelLabel(bestHard);
     document.getElementById('kpiHardSub').innerHTML =
-      `${bestHard.dataset} &nbsp;&middot;&nbsp; ${bestHard.date}${timePart}${hardModelTag}`;
+      `${bestHard.dataset} &nbsp;&middot;&nbsp; ${bestHard.date}${timePart}${hLabel ? '<br><span class="model-tag">' + hLabel + '</span>' : ''}`;
   }
 }
 
-// Hide "(line)" entries from legend globally
+function populateCards() {
+  // v44
+  const v44rows = allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking');
+  if (v44rows.length) {
+    const v44accs = v44rows.filter(r => r.accuracy !== null);
+    const bestA = v44accs.length ? v44accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    if (bestA) {
+      document.getElementById('mc-v44-acc').textContent = bestA.accuracy.toFixed(1) + '%';
+      document.getElementById('mc-v44-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
+    }
+    const hardRows = v44rows.filter(r => r.hardAcc !== null);
+    if (hardRows.length) {
+      const bestH = hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b);
+      document.getElementById('mc-v44-hard').textContent = bestH.hardAcc.toFixed(1) + '%';
+      document.getElementById('mc-v44-hard-sub').textContent = bestH.dataset + ' · ' + bestH.date;
+    }
+    const models = [...new Set(v44rows.map(r => r.model).filter(Boolean))];
+    document.getElementById('mc-v44-meta').textContent =
+      `${v44rows.length} runs · Models: ${models.join(', ')}`;
+  }
+
+  // v43
+  const v43rows = allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking');
+  if (v43rows.length) {
+    const v43accs = v43rows.filter(r => r.accuracy !== null);
+    const bestA = v43accs.length ? v43accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    if (bestA) {
+      document.getElementById('mc-v43-acc').textContent = bestA.accuracy.toFixed(1) + '%';
+      document.getElementById('mc-v43-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
+    }
+    const hardRows = v43rows.filter(r => r.hardAcc !== null);
+    if (hardRows.length) {
+      const bestH = hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b);
+      document.getElementById('mc-v43-hard').textContent = bestH.hardAcc.toFixed(1) + '%';
+      document.getElementById('mc-v43-hard-sub').textContent = bestH.dataset + ' · ' + bestH.date;
+    }
+    const dates = v43rows.map(r => r.date).filter(Boolean).sort();
+    document.getElementById('mc-v43-meta').textContent =
+      `${v43rows.length} runs · ${dates[0]} to ${dates[dates.length-1]}`;
+  }
+
+  // thinking
+  const thinkRows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
+  if (thinkRows.length) {
+    const bestA = thinkRows.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
+    document.getElementById('mc-think-acc').textContent = bestA.accuracy.toFixed(1) + '%';
+    document.getElementById('mc-think-acc-sub').textContent = bestA.dataset + ' · ' + bestA.date;
+    const versions = [...new Set(allData.filter(r => r.model === 'thinking').map(r => r.version))];
+    document.getElementById('mc-think-meta').textContent =
+      `${thinkRows.length} runs · Evaluated on: ${versions.join(', ')}`;
+  }
+}
+
+function toggleDetail(key) {
+  if (activeDetail === key) {
+    closeDetail();
+    return;
+  }
+  // Deactivate all
+  document.querySelectorAll('.mc').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.detail-section').forEach(s => s.style.display = 'none');
+  ['v44','v43','think'].forEach(k => {
+    const el = document.getElementById('mc-' + k + '-cta-text');
+    if (el) el.textContent = 'Click to view details';
+  });
+  // Activate
+  document.getElementById('mc-' + key).classList.add('active');
+  document.getElementById('mc-' + key + '-cta-text').textContent = 'Collapse';
+  document.getElementById('detail-' + key).style.display = 'block';
+
+  const panel = document.getElementById('detailPanel');
+  panel.classList.add('open');
+
+  const titles = {
+    v44: 'v44.x — Detailed View',
+    v43: 'v43.x — Detailed View',
+    think: '🧠 Thinking Model — Detailed View'
+  };
+  const colors = { v44: '#38bdf8', v43: '#818cf8', think: '#34d399' };
+  document.getElementById('dpTitle').textContent = titles[key];
+  document.getElementById('dpHeader').style.background =
+    `linear-gradient(90deg, ${colors[key]}1a 0%, transparent 80%)`;
+
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+
+  if (!chartInitialized[key]) {
+    chartInitialized[key] = true;
+    initCharts(key);
+    populateDetailStats(key);
+    populateMiniTable(key);
+  }
+  activeDetail = key;
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.querySelectorAll('.mc').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.detail-section').forEach(s => s.style.display = 'none');
+  ['v44','v43','think'].forEach(k => {
+    const el = document.getElementById('mc-' + k + '-cta-text');
+    if (el) el.textContent = 'Click to view details';
+  });
+  activeDetail = null;
+}
+
+function initCharts(key) {
+  if (key === 'v44') {
+    buildVersionAccChart('v44.x', 'c_v44_acc');
+    buildHardChart('v44.x', 'c_v44_hard');
+  } else if (key === 'v43') {
+    buildVersionAccChart('v43.x', 'c_v43_acc');
+  } else if (key === 'think') {
+    buildThinkingChart();
+  }
+}
+
+function populateDetailStats(key) {
+  if (key === 'v44') {
+    const rows = allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking');
+    const accs = rows.filter(r => r.accuracy !== null);
+    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    const hardRows = rows.filter(r => r.hardAcc !== null);
+    const bestH = hardRows.length ? hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
+    const datasets = [...new Set(rows.map(r => r.dataset))];
+    const models = [...new Set(rows.map(r => r.model).filter(Boolean))];
+    document.getElementById('ds-v44').innerHTML = `
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#38bdf8">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH ? bestH.hardAcc.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestH ? bestH.dataset+' · '+bestH.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">${datasets.length} datasets</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Models Used</div><div class="dp-stat-val" style="font-size:0.85rem;line-height:1.5;margin-top:6px">${models.join('<br>')}</div></div>
+    `;
+  } else if (key === 'v43') {
+    const rows = allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking');
+    const accs = rows.filter(r => r.accuracy !== null);
+    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    const hardRows = rows.filter(r => r.hardAcc !== null);
+    const bestH = hardRows.length ? hardRows.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
+    const datasets = [...new Set(rows.map(r => r.dataset))];
+    document.getElementById('ds-v43').innerHTML = `
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Accuracy</div><div class="dp-stat-val" style="color:#818cf8">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Best Hard Accuracy</div><div class="dp-stat-val" style="color:#a78bfa">${bestH ? bestH.hardAcc.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestH ? bestH.dataset+' · '+bestH.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">${datasets.length} datasets</div></div>
+    `;
+  } else if (key === 'think') {
+    const rows = allData.filter(r => r.model === 'thinking');
+    const accs = rows.filter(r => r.accuracy !== null);
+    const bestA = accs.length ? accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b) : null;
+    const versions = [...new Set(rows.map(r => r.version))];
+    document.getElementById('ds-think').innerHTML = `
+      <div class="dp-stat-card"><div class="dp-stat-label">Accuracy</div><div class="dp-stat-val" style="color:#34d399">${bestA ? bestA.accuracy.toFixed(1)+'%' : '–'}</div><div class="dp-stat-sub">${bestA ? bestA.dataset+' · '+bestA.date : ''}</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Total Runs</div><div class="dp-stat-val">${rows.length}</div><div class="dp-stat-sub">Across all versions</div></div>
+      <div class="dp-stat-card"><div class="dp-stat-label">Versions Tested</div><div class="dp-stat-val" style="font-size:0.85rem;line-height:1.5;margin-top:6px">${versions.join('<br>')}</div></div>
+    `;
+  }
+}
+
+function populateMiniTable(key) {
+  if (key === 'v44') {
+    const rows = [...allData.filter(r => r.version === 'v44.x' && r.model !== 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
+    const tb = document.getElementById('mt-v44');
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
+      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td><td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td><td>${r.model || '–'}</td>`;
+      tb.appendChild(tr);
+    });
+  } else if (key === 'v43') {
+    const rows = [...allData.filter(r => r.version === 'v43.x' && r.model !== 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
+    const tb = document.getElementById('mt-v43');
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
+      tr.innerHTML = `<td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td><td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>`;
+      tb.appendChild(tr);
+    });
+  } else if (key === 'think') {
+    const rows = [...allData.filter(r => r.model === 'thinking')].sort((a,b) => b.date.localeCompare(a.date));
+    const tb = document.getElementById('mt-think');
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const ac = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
+      tr.innerHTML = `<td>${r.version}</td><td>${r.date}</td><td>${r.dataset}</td><td class="${ac}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td><td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+}
+
+// Hide "(line)" from legend globally
 Chart.defaults.plugins.legend.labels.filter = item => !item.text.endsWith('(line)');
 
-// ---- Category-scale chart options ----
 function makeOptions(yLabel, labels) {
   return {
     responsive: true,
@@ -305,12 +669,7 @@ function makeOptions(yLabel, labels) {
       x: {
         type: 'category',
         labels: labels,
-        ticks: {
-          color: '#94a3b8',
-          maxRotation: 45,
-          minRotation: 0,
-          autoSkip: false,
-        },
+        ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 0, autoSkip: false },
         grid: { color: '#1e293b55' }
       },
       y: {
@@ -327,35 +686,22 @@ function buildCategoryDatasets(groups, yField, labels) {
   Object.entries(groups).forEach(([key, rows]) => {
     const lookup = {};
     rows.filter(r => r[yField] !== null).forEach(r => {
-      if (lookup[r.date] === undefined || r[yField] > lookup[r.date]) {
-        lookup[r.date] = r[yField];
-      }
+      if (lookup[r.date] === undefined || r[yField] > lookup[r.date]) lookup[r.date] = r[yField];
     });
     const data = labels.map(l => lookup[l] !== undefined ? lookup[l] : null);
     const col = dsColor(key);
     datasets.push({
-      label: key,
-      data,
-      borderColor: col,
-      backgroundColor: col,
+      label: key, data,
+      borderColor: col, backgroundColor: col,
       pointRadius: data.map(v => v !== null ? 6 : 0),
       pointHoverRadius: data.map(v => v !== null ? 9 : 0),
-      showLine: false,
-      spanGaps: false,
-      order: 1,
+      showLine: false, spanGaps: false, order: 1,
     });
     datasets.push({
-      label: key + ' (line)',
-      data,
-      borderColor: hexAlpha(col, 0.30),
-      backgroundColor: 'transparent',
-      borderDash: [5, 6],
-      borderWidth: 1.5,
-      pointRadius: 0,
-      tension: 0.45,
-      showLine: true,
-      spanGaps: true,
-      order: 2,
+      label: key + ' (line)', data,
+      borderColor: hexAlpha(col, 0.30), backgroundColor: 'transparent',
+      borderDash: [5, 6], borderWidth: 1.5, pointRadius: 0,
+      tension: 0.45, showLine: true, spanGaps: true, order: 2,
     });
   });
   return datasets;
@@ -365,17 +711,11 @@ function getLabels(rows) {
   return [...new Set(rows.map(r => r.date))].sort();
 }
 
-// ---- Chart builders ----
-
-// Single thinking model chart - group by dataset only (not version)
-// All thinking rows share the same "revised_GD" dataset so this gives one clean series
 function buildThinkingChart() {
   const rows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
   const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
   const groups = {};
-  dsNames.forEach(ds => {
-    groups[ds] = rows.filter(r => r.dataset === ds);
-  });
+  dsNames.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
   const labels = getLabels(rows);
   new Chart(document.getElementById('c_think'), {
     type: 'line',
@@ -408,19 +748,6 @@ function buildHardChart(version, canvasId) {
   });
 }
 
-function buildTimeChart() {
-  const rows = allData.filter(r => r.avgTime !== null);
-  const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
-  const groups = {};
-  dsNames.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
-  const labels = getLabels(rows);
-  new Chart(document.getElementById('c_time'), {
-    type: 'line',
-    data: { labels, datasets: buildCategoryDatasets(groups, 'avgTime', labels) },
-    options: makeOptions('Avg Time (s)', labels)
-  });
-}
-
 function renderTable() {
   const tb = document.getElementById('tableBody');
   const sorted = [...allData].sort((a, b) => b.date.localeCompare(a.date));
@@ -428,11 +755,10 @@ function renderTable() {
     const tr = document.createElement('tr');
     const accClass = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
     const badgeClass = r.model === 'thinking' ? 'badge-thinking' : r.version === 'v44.x' ? 'badge-v44' : 'badge-v43';
-    const versionLabel = r.model === 'thinking' ? 'thinking model' : r.version;
+    const vLabel = r.model === 'thinking' ? 'thinking model' : r.version;
     tr.innerHTML = `
-      <td><span class="badge ${badgeClass}">${versionLabel}</span></td>
-      <td>${r.date}</td>
-      <td>${r.dataset}</td>
+      <td><span class="badge ${badgeClass}">${vLabel}</span></td>
+      <td>${r.date}</td><td>${r.dataset}</td>
       <td class="${accClass}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td>
       <td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td>
       <td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>
