@@ -32,9 +32,7 @@
       background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
       border-bottom: 1px solid var(--border);
       padding: 28px 40px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      display: flex; align-items: center; gap: 16px;
     }
     header .logo {
       width: 44px; height: 44px;
@@ -45,9 +43,10 @@
     }
     header h1 { font-size: 1.6rem; font-weight: 700; }
     header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
     .kpi-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 16px;
       padding: 28px 40px 0;
     }
@@ -56,73 +55,88 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .kpi::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--kpi-color, var(--accent));
     }
-    .kpi .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-    .kpi .value { font-size: 2rem; font-weight: 700; margin-top: 6px; color: var(--kpi-color, var(--accent)); }
-    .kpi .sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    .kpi .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .kpi .value { font-size: 1.9rem; font-weight: 700; margin-top: 6px; color: var(--kpi-color, var(--accent)); }
+    .kpi .sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    .section-title {
+      padding: 32px 40px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      border-top: 1px solid var(--border);
+      margin-top: 28px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .pill {
+      font-size: 0.72rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .pill-v44 { background: rgba(56,189,248,0.15); color: var(--accent); }
+    .pill-v43 { background: rgba(129,140,248,0.15); color: var(--accent2); }
+
+    .chart-row {
+      padding: 16px 40px;
+      display: flex;
+      flex-direction: column;
       gap: 20px;
-      padding: 24px 40px;
     }
     .chart-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 24px 28px;
+      width: 100%;
     }
-    .chart-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
-    .chart-card .hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; }
-    .chart-card canvas { max-height: 300px; }
-    .table-section { padding: 0 40px 40px; }
+    .chart-card h3 {
+      font-size: 0.92rem; font-weight: 600;
+      margin-bottom: 4px; color: var(--text);
+    }
+    .chart-card .hint {
+      font-size: 0.73rem; color: var(--muted); margin-bottom: 18px;
+    }
+    .chart-card canvas { height: 340px !important; width: 100% !important; }
+
+    .table-section { padding: 28px 40px 40px; border-top: 1px solid var(--border); margin-top: 12px; }
     .table-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
     .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     thead tr { background: var(--surface2); }
-    th { padding: 12px 16px; text-align: left; color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+    th { padding: 12px 16px; text-align: left; color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
     tbody tr { border-top: 1px solid var(--border); transition: background 0.15s; }
     tbody tr:hover { background: var(--surface2); }
     td { padding: 10px 16px; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.73rem; font-weight: 600; }
     .badge-v44 { background: rgba(56,189,248,0.15); color: var(--accent); }
     .badge-v43 { background: rgba(129,140,248,0.15); color: var(--accent2); }
+    .badge-thinking { background: rgba(52,211,153,0.15); color: var(--accent3); }
     .acc-high { color: var(--accent3); font-weight: 600; }
     .acc-mid { color: var(--accent4); font-weight: 600; }
     .acc-low { color: #f87171; font-weight: 600; }
+
     footer {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: 0.78rem;
+      text-align: center; padding: 24px;
+      color: var(--muted); font-size: 0.78rem;
       border-top: 1px solid var(--border);
     }
     @media (max-width: 700px) {
-      header { padding: 20px; }
-      .kpi-row, .charts-grid, .table-section { padding-left: 16px; padding-right: 16px; }
-      .charts-grid { grid-template-columns: 1fr; }
+      header, .kpi-row, .section-title, .chart-row, .table-section { padding-left: 16px; padding-right: 16px; }
     }
   </style>
 </head>
 <body>
+
 <header>
   <div class="logo">A</div>
   <div>
     <h1>Analytics Agent &ndash; Model Performance Dashboard</h1>
-    <p>Coupa AI &bull; Evaluation Metrics Tracker</p>
+    <p>Coupa AI &bull; Evaluation Metrics Tracker &bull; Click legend labels to toggle datasets</p>
   </div>
 </header>
 
@@ -154,32 +168,63 @@
   </div>
 </div>
 
-<div class="charts-grid">
+<!-- v44.x section -->
+<div class="section-title">
+  <span>v44.x</span>
+  <span class="pill pill-v44">v44.x</span>
+</div>
+<div class="chart-row">
   <div class="chart-card">
-    <h3>Accuracy Over Time – by Dataset</h3>
-    <p class="hint">Click a legend item to show/hide that dataset</p>
-    <canvas id="chartTimeline"></canvas>
+    <h3>v44.x – Accuracy Over Time by Dataset</h3>
+    <p class="hint">Dots = individual runs &nbsp;|&nbsp; Dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
+    <canvas id="c_v44_acc"></canvas>
   </div>
   <div class="chart-card">
-    <h3>Latest Accuracy by Dataset</h3>
-    <p class="hint">Most recent run per dataset across all versions</p>
-    <canvas id="chartBar"></canvas>
-  </div>
-  <div class="chart-card" style="grid-column: 1 / -1;">
-    <h3>Hard Accuracy Trend</h3>
-    <p class="hint">Click a legend item to show/hide a version</p>
-    <canvas id="chartHard"></canvas>
+    <h3>v44.x – Hard Accuracy Over Time</h3>
+    <p class="hint">Dots = individual runs &nbsp;|&nbsp; Dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
+    <canvas id="c_v44_hard"></canvas>
   </div>
 </div>
 
+<!-- v43.x section -->
+<div class="section-title">
+  <span>v43.x</span>
+  <span class="pill pill-v43">v43.x</span>
+</div>
+<div class="chart-row">
+  <div class="chart-card">
+    <h3>v43.x – Accuracy Over Time by Dataset</h3>
+    <p class="hint">Dots = individual runs &nbsp;|&nbsp; Dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
+    <canvas id="c_v43_acc"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>v43.x – Hard Accuracy Over Time</h3>
+    <p class="hint">Dots = individual runs &nbsp;|&nbsp; Dotted line = trend &nbsp;|&nbsp; Click legend to toggle</p>
+    <canvas id="c_v43_hard"></canvas>
+  </div>
+</div>
+
+<!-- Avg Time section -->
+<div class="section-title" style="border-top: none; margin-top: 8px;">
+  <span>Avg Time per Query</span>
+</div>
+<div class="chart-row">
+  <div class="chart-card">
+    <h3>Avg Time per Query – by Dataset (All Versions)</h3>
+    <p class="hint">Click legend to toggle datasets</p>
+    <canvas id="c_time"></canvas>
+  </div>
+</div>
+
+<!-- Table -->
 <div class="table-section">
   <h3>All Evaluation Runs</h3>
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>Version</th><th>Date</th><th>Dataset</th><th>Accuracy (%)</th>
-          <th>Avg Time (s)</th><th>GPT Model</th><th>Hard Accuracy (%)</th>
+          <th>Version</th><th>Date</th><th>Dataset</th>
+          <th>Accuracy (%)</th><th>Hard Acc (%)</th><th>Precision (%)</th><th>Avg Time (s)</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -187,165 +232,201 @@
   </div>
 </div>
 
-<footer>Last updated: <span id="lastUpdated"></span> &bull; <a href="https://github.com/analytics-agent-coupa/analytics-agent-coupa.github.io" style="color:var(--accent)" target="_blank">View on GitHub</a></footer>
+<footer>
+  Last updated: <span id="lastUpdated"></span>
+  &bull; <a href="https://github.com/analytics-agent-coupa/analytics-agent-coupa.github.io" style="color:var(--accent)" target="_blank">View on GitHub</a>
+</footer>
 
 <script>
-const FILES = ['data/v44x.csv','data/v43x.csv'];
+const FILES = ['data/v44x.csv', 'data/v43x.csv'];
 let allData = [];
 
-const COLORS = [
-  '#38bdf8','#818cf8','#34d399','#fb923c','#f472b6','#a78bfa','#facc15','#4ade80'
+// Distinct color palette per dataset name
+const DS_COLORS = [
+  '#38bdf8','#818cf8','#34d399','#fb923c',
+  '#f472b6','#a78bfa','#facc15','#4ade80','#f87171','#67e8f9'
 ];
+const colorMap = {};
+let colorIdx = 0;
+function dsColor(key) {
+  if (!colorMap[key]) { colorMap[key] = DS_COLORS[colorIdx++ % DS_COLORS.length]; }
+  return colorMap[key];
+}
 
 async function loadAll() {
   const results = await Promise.all(FILES.map(f => new Promise(resolve => {
     Papa.parse(f, { download: true, header: true, skipEmptyLines: true, complete: r => resolve(r.data) });
   })));
   allData = results.flat().map(r => ({
-    version: r.Version?.trim() || '',
-    date: r.Date?.trim() || '',
-    dataset: r.Dataset?.trim() || '',
+    version:  r.Version?.trim() || '',
+    date:     r.Date?.trim() || '',
+    dataset:  r.Dataset?.trim() || '',
     accuracy: parseFloat(r.Accuracy) || null,
-    avgTime: parseFloat(r.Avg_Time_per_Query) || null,
-    model: r.GPT_Model?.trim() || '',
-    hardAcc: parseFloat(r.Hard_Accuracy) || null,
+    avgTime:  parseFloat(r.Avg_Time_per_Query) || null,
+    model:    r.GPT_Model?.trim() || '',
+    hardAcc:  parseFloat(r.Hard_Accuracy) || null,
+    precision: parseFloat(r.Precision) || null,
   }));
-  render();
-  document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  renderKPIs();
+  buildVersionAccChart('v44.x', 'c_v44_acc');
+  buildHardChart('v44.x', 'c_v44_hard');
+  buildVersionAccChart('v43.x', 'c_v43_acc');
+  buildHardChart('v43.x', 'c_v43_hard');
+  buildTimeChart();
+  renderTable();
+  document.getElementById('lastUpdated').textContent =
+    new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-let charts = {};
-function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
-
-function render() {
-  renderKPIs(allData);
-  renderTimeline(allData);
-  renderBar(allData);
-  renderHard(allData);
-  renderTable(allData);
-}
-
-function renderKPIs(data) {
-  const accs = data.filter(d => d.accuracy !== null);
+// ── KPIs ──────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const accs = allData.filter(d => d.accuracy !== null);
   if (!accs.length) return;
-  const best = accs.reduce((a,b) => a.accuracy > b.accuracy ? a : b);
-  const avg = accs.reduce((s,r) => s + r.accuracy, 0) / accs.length;
-  const times = data.filter(d => d.avgTime !== null);
-  const avgTime = times.length ? times.reduce((s,r) => s + r.avgTime, 0) / times.length : null;
-  const hards = data.filter(d => d.hardAcc !== null);
-  const bestHard = hards.length ? hards.reduce((a,b) => a.hardAcc > b.hardAcc ? a : b) : null;
+  const best = accs.reduce((a, b) => a.accuracy > b.accuracy ? a : b);
+  const avg  = accs.reduce((s, r) => s + r.accuracy, 0) / accs.length;
+  const times = allData.filter(d => d.avgTime !== null);
+  const avgTime = times.length ? times.reduce((s, r) => s + r.avgTime, 0) / times.length : null;
+  const hards = allData.filter(d => d.hardAcc !== null);
+  const bestHard = hards.length ? hards.reduce((a, b) => a.hardAcc > b.hardAcc ? a : b) : null;
   document.getElementById('kpiBest').textContent = best.accuracy.toFixed(1) + '%';
   document.getElementById('kpiBestSub').textContent = best.dataset + ' · ' + best.date;
   document.getElementById('kpiAvg').textContent = avg.toFixed(1) + '%';
   document.getElementById('kpiAvgSub').textContent = accs.length + ' runs';
   document.getElementById('kpiTime').textContent = avgTime !== null ? avgTime.toFixed(2) + 's' : '–';
-  document.getElementById('kpiRuns').textContent = data.length;
-  document.getElementById('kpiRunsSub').textContent = [...new Set(data.map(d=>d.version))].join(', ');
+  document.getElementById('kpiRuns').textContent = allData.length;
+  document.getElementById('kpiRunsSub').textContent = [...new Set(allData.map(d => d.version))].join(', ');
   document.getElementById('kpiHard').textContent = bestHard ? bestHard.hardAcc.toFixed(1) + '%' : '–';
   document.getElementById('kpiHardSub').textContent = bestHard ? bestHard.date : '';
 }
 
-function renderTimeline(data) {
-  destroyChart('timeline');
-  const datasets = [...new Set(data.map(d => d.dataset))].sort();
-  const chartData = {
-    datasets: datasets.map((ds, i) => ({
-      label: ds,
-      data: data.filter(d => d.dataset === ds && d.accuracy !== null).map(d => ({ x: d.date, y: d.accuracy })),
-      backgroundColor: COLORS[i % COLORS.length],
-      borderColor: COLORS[i % COLORS.length],
-      pointRadius: 6,
-      pointHoverRadius: 9,
-      showLine: false,
-    }))
-  };
-  const ctx = document.getElementById('chartTimeline').getContext('2d');
-  charts['timeline'] = new Chart(ctx, {
-    type: 'scatter',
-    data: chartData,
-    options: dotChartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
-  });
-}
-
-function renderBar(data) {
-  destroyChart('bar');
-  const datasets = [...new Set(data.map(d => d.dataset))].sort();
-  const latest = datasets.map(ds => {
-    const rows = data.filter(r => r.dataset === ds && r.accuracy !== null).sort((a,b) => b.date.localeCompare(a.date));
-    return rows[0] ? rows[0].accuracy : null;
-  });
-  const ctx = document.getElementById('chartBar').getContext('2d');
-  charts['bar'] = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: datasets,
-      datasets: [{ label: 'Latest Accuracy (%)', data: latest, backgroundColor: COLORS, borderRadius: 6 }]
-    },
-    options: dotChartOptions({})
-  });
-}
-
-function renderHard(data) {
-  destroyChart('hard');
-  const versions = [...new Set(data.map(d => d.version))].sort();
-  const ctx = document.getElementById('chartHard').getContext('2d');
-  charts['hard'] = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: versions.map((ver, i) => {
-        const rows = data.filter(d => d.version === ver && d.hardAcc !== null).sort((a,b) => a.date.localeCompare(b.date));
-        return {
-          label: ver,
-          data: rows.map(d => ({ x: d.date, y: d.hardAcc })),
-          backgroundColor: COLORS[i % COLORS.length],
-          borderColor: COLORS[i % COLORS.length],
-          pointRadius: 7,
-          pointHoverRadius: 10,
-          showLine: false,
-        };
-      })
-    },
-    options: dotChartOptions({ x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } })
-  });
-}
-
-function dotChartOptions(xAxis) {
+// ── Chart helpers ─────────────────────────────────────────────────────
+function makeOptions(yLabel) {
   return {
-    responsive: true, maintainAspectRatio: true,
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
     plugins: {
       legend: {
-        labels: { color: '#94a3b8', boxWidth: 12 },
-        onClick(e, legendItem, legend) {
-          const index = legendItem.datasetIndex;
+        labels: { color: '#94a3b8', boxWidth: 12, padding: 16 },
+        onClick(e, item, legend) {
           const ci = legend.chart;
-          if (ci.isDatasetVisible(index)) ci.hide(index);
-          else ci.show(index);
+          // toggle both dot + line datasets (they come in pairs)
+          const idx = item.datasetIndex;
+          const partner = idx % 2 === 0 ? idx + 1 : idx - 1;
+          [idx, partner].forEach(i => {
+            if (ci.isDatasetVisible(i)) ci.hide(i); else ci.show(i);
+          });
         }
       },
-      tooltip: { backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1, titleColor: '#e2e8f0', bodyColor: '#94a3b8' }
+      tooltip: {
+        backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1,
+        titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+        callbacks: {
+          title: items => items[0].raw.x || items[0].label,
+          label: item => ` ${item.dataset.label.replace(' (line)', '')}: ${item.raw.y != null ? item.raw.y.toFixed(2) : item.raw}`
+        }
+      }
     },
     scales: {
-      x: Object.assign({ ticks: { color: '#94a3b8' }, grid: { color: '#1e293b33' } }, xAxis.x || {}),
-      y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, title: { display: true, text: 'Accuracy (%)', color: '#94a3b8' } }
+      x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b55' } },
+      y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, title: { display: true, text: yLabel, color: '#94a3b8' } }
     }
   };
 }
 
-function renderTable(data) {
+function dottedLineDatasets(groups, yField) {
+  // For each group, create a dot dataset + a smooth dotted-line dataset (hidden from legend)
+  const datasets = [];
+  Object.entries(groups).forEach(([key, rows]) => {
+    const sorted = rows.filter(r => r[yField] !== null).sort((a, b) => a.date.localeCompare(b.date));
+    const pts = sorted.map(r => ({ x: r.date, y: r[yField] }));
+    const col = dsColor(key);
+    // Dots
+    datasets.push({
+      label: key,
+      data: pts,
+      type: 'scatter',
+      backgroundColor: col,
+      borderColor: col,
+      pointRadius: 6,
+      pointHoverRadius: 9,
+      showLine: false,
+      order: 1,
+    });
+    // Smooth dotted line (same label so tooltip groups them; hidden in legend via filter)
+    datasets.push({
+      label: key + ' (line)',
+      data: pts,
+      type: 'line',
+      borderColor: col,
+      backgroundColor: 'transparent',
+      borderDash: [6, 5],
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.45,
+      showLine: true,
+      order: 2,
+    });
+  });
+  return datasets;
+}
+
+// Filter legend to hide "(line)" entries
+Chart.defaults.plugins.legend.labels.filter = (item) => !item.text.endsWith('(line)');
+
+// ── Accuracy charts ───────────────────────────────────────────────────
+function buildVersionAccChart(version, canvasId) {
+  const rows = allData.filter(r => r.version === version);
+  const datasets = [...new Set(rows.map(r => r.dataset))].sort();
+  const groups = {};
+  datasets.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
+  new Chart(document.getElementById(canvasId), {
+    type: 'scatter',
+    data: { datasets: dottedLineDatasets(groups, 'accuracy') },
+    options: makeOptions('Accuracy (%)')
+  });
+}
+
+// ── Hard accuracy charts ──────────────────────────────────────────────
+function buildHardChart(version, canvasId) {
+  const rows = allData.filter(r => r.version === version && r.hardAcc !== null);
+  const groups = { [version + ' Hard Acc']: rows };
+  new Chart(document.getElementById(canvasId), {
+    type: 'scatter',
+    data: { datasets: dottedLineDatasets(groups, 'hardAcc') },
+    options: makeOptions('Hard Accuracy (%)')
+  });
+}
+
+// ── Avg Time chart ────────────────────────────────────────────────────
+function buildTimeChart() {
+  const rows = allData.filter(r => r.avgTime !== null);
+  const datasets = [...new Set(rows.map(r => r.dataset))].sort();
+  const groups = {};
+  datasets.forEach(ds => { groups[ds] = rows.filter(r => r.dataset === ds); });
+  new Chart(document.getElementById('c_time'), {
+    type: 'scatter',
+    data: { datasets: dottedLineDatasets(groups, 'avgTime') },
+    options: makeOptions('Avg Time (s)')
+  });
+}
+
+// ── Table ─────────────────────────────────────────────────────────────
+function renderTable() {
   const tb = document.getElementById('tableBody');
-  tb.innerHTML = '';
-  const sorted = [...data].sort((a,b) => b.date.localeCompare(a.date));
+  const sorted = [...allData].sort((a, b) => b.date.localeCompare(a.date));
   sorted.forEach(r => {
     const tr = document.createElement('tr');
     const accClass = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
+    const badgeClass = r.model === 'thinking' ? 'badge-thinking' : r.version === 'v44.x' ? 'badge-v44' : 'badge-v43';
     tr.innerHTML = `
-      <td><span class="badge ${r.version === 'v44.x' ? 'badge-v44' : 'badge-v43'}">${r.version}</span></td>
+      <td><span class="badge ${badgeClass}">${r.version}${r.model === 'thinking' ? ' 🧠' : ''}</span></td>
       <td>${r.date}</td>
       <td>${r.dataset}</td>
       <td class="${accClass}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td>
-      <td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>
-      <td>${r.model || '–'}</td>
       <td>${r.hardAcc !== null ? r.hardAcc.toFixed(1) : '–'}</td>
+      <td>${r.precision !== null ? r.precision.toFixed(1) : '–'}</td>
+      <td>${r.avgTime !== null ? r.avgTime.toFixed(2) : '–'}</td>
     `;
     tb.appendChild(tr);
   });
