@@ -126,7 +126,7 @@
 <div class="chart-row">
   <div class="chart-card">
     <h3>Thinking Model – Accuracy Over Time</h3>
-    <p class="hint">All thinking model runs across versions &nbsp;|&nbsp; Click legend to toggle</p>
+    <p class="hint">All thinking model runs on revised_GD dataset &nbsp;|&nbsp; Click legend to toggle</p>
     <canvas id="c_think"></canvas>
   </div>
 </div>
@@ -169,18 +169,6 @@
     <h3>Avg Time per Query – by Dataset (All Versions)</h3>
     <p class="hint">Click legend to toggle datasets</p>
     <canvas id="c_time"></canvas>
-  </div>
-</div>
-
-<!-- Precision -->
-<div class="section-title" style="border-top: none; margin-top: 8px;">
-  <span>Precision</span>
-</div>
-<div class="chart-row">
-  <div class="chart-card">
-    <h3>Precision Over Time (All Versions)</h3>
-    <p class="hint">Click legend to toggle versions</p>
-    <canvas id="c_precision"></canvas>
   </div>
 </div>
 
@@ -245,10 +233,14 @@ async function loadAll() {
   buildHardChart('v44.x', 'c_v44_hard');
   buildVersionAccChart('v43.x', 'c_v43_acc');
   buildTimeChart();
-  buildPrecisionChart();
   renderTable();
   document.getElementById('lastUpdated').textContent =
     new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function modelLabel(row) {
+  if (row.model === 'thinking') return 'thinking model';
+  return row.version || row.model;
 }
 
 function renderKPIs() {
@@ -259,7 +251,8 @@ function renderKPIs() {
   const bestHard = hards.length ? hards.reduce((a, b) => a.hardAcc > b.hardAcc ? a : b) : null;
 
   document.getElementById('kpiBest').textContent = best.accuracy.toFixed(1) + '%';
-  const modelTag = best.model ? `<span class="model-tag">🧠 ${best.model}</span>` : '';
+  const mLabel = modelLabel(best);
+  const modelTag = mLabel ? `<span class="model-tag">${mLabel}</span>` : '';
   document.getElementById('kpiBestSub').innerHTML =
     `${best.dataset} &nbsp;&middot;&nbsp; ${best.date}${modelTag ? '<br>' + modelTag : ''}`;
 
@@ -269,7 +262,10 @@ function renderKPIs() {
   if (bestHard) {
     document.getElementById('kpiHard').textContent = bestHard.hardAcc.toFixed(1) + '%';
     const timePart = bestHard.avgTime !== null ? ` · ${bestHard.avgTime.toFixed(2)}s` : '';
-    document.getElementById('kpiHardSub').textContent = bestHard.dataset + ' · ' + bestHard.date + timePart;
+    const hardMLabel = modelLabel(bestHard);
+    const hardModelTag = hardMLabel ? `<br><span class="model-tag">${hardMLabel}</span>` : '';
+    document.getElementById('kpiHardSub').innerHTML =
+      `${bestHard.dataset} &nbsp;&middot;&nbsp; ${bestHard.date}${timePart}${hardModelTag}`;
   }
 }
 
@@ -277,7 +273,6 @@ function renderKPIs() {
 Chart.defaults.plugins.legend.labels.filter = item => !item.text.endsWith('(line)');
 
 // ---- Category-scale chart options ----
-// labels = sorted unique date strings for that chart
 function makeOptions(yLabel, labels) {
   return {
     responsive: true,
@@ -314,7 +309,7 @@ function makeOptions(yLabel, labels) {
           color: '#94a3b8',
           maxRotation: 45,
           minRotation: 0,
-          autoSkip: false,   // show every label — each = a real data date
+          autoSkip: false,
         },
         grid: { color: '#1e293b55' }
       },
@@ -327,21 +322,17 @@ function makeOptions(yLabel, labels) {
   };
 }
 
-// Build line datasets from groups using shared category labels.
-// Each dataset maps its values to the shared labels, null where no data.
 function buildCategoryDatasets(groups, yField, labels) {
   const datasets = [];
   Object.entries(groups).forEach(([key, rows]) => {
     const lookup = {};
     rows.filter(r => r[yField] !== null).forEach(r => {
-      // If multiple rows share same date, keep the last one (or average could be used)
       if (lookup[r.date] === undefined || r[yField] > lookup[r.date]) {
         lookup[r.date] = r[yField];
       }
     });
     const data = labels.map(l => lookup[l] !== undefined ? lookup[l] : null);
     const col = dsColor(key);
-    // Dot layer
     datasets.push({
       label: key,
       data,
@@ -353,7 +344,6 @@ function buildCategoryDatasets(groups, yField, labels) {
       spanGaps: false,
       order: 1,
     });
-    // Faint smooth dotted trend line
     datasets.push({
       label: key + ' (line)',
       data,
@@ -364,27 +354,27 @@ function buildCategoryDatasets(groups, yField, labels) {
       pointRadius: 0,
       tension: 0.45,
       showLine: true,
-      spanGaps: true,   // connect through nulls for the trend line only
+      spanGaps: true,
       order: 2,
     });
   });
   return datasets;
 }
 
-// Get sorted unique date labels for a set of rows
 function getLabels(rows) {
   return [...new Set(rows.map(r => r.date))].sort();
 }
 
 // ---- Chart builders ----
 
+// Single thinking model chart - group by dataset only (not version)
+// All thinking rows share the same "revised_GD" dataset so this gives one clean series
 function buildThinkingChart() {
   const rows = allData.filter(r => r.model === 'thinking' && r.accuracy !== null);
-  // Group by version+dataset label so v43 and v44 entries are distinguished
-  const dsNames = [...new Set(rows.map(r => `${r.version} · ${r.dataset}`))].sort();
+  const dsNames = [...new Set(rows.map(r => r.dataset))].sort();
   const groups = {};
-  dsNames.forEach(k => {
-    groups[k] = rows.filter(r => `${r.version} · ${r.dataset}` === k);
+  dsNames.forEach(ds => {
+    groups[ds] = rows.filter(r => r.dataset === ds);
   });
   const labels = getLabels(rows);
   new Chart(document.getElementById('c_think'), {
@@ -431,19 +421,6 @@ function buildTimeChart() {
   });
 }
 
-function buildPrecisionChart() {
-  const rows = allData.filter(r => r.precision !== null && r.model !== 'thinking');
-  const versions = [...new Set(rows.map(r => r.version))].sort();
-  const groups = {};
-  versions.forEach(v => { groups[v] = rows.filter(r => r.version === v); });
-  const labels = getLabels(rows);
-  new Chart(document.getElementById('c_precision'), {
-    type: 'line',
-    data: { labels, datasets: buildCategoryDatasets(groups, 'precision', labels) },
-    options: makeOptions('Precision (%)', labels)
-  });
-}
-
 function renderTable() {
   const tb = document.getElementById('tableBody');
   const sorted = [...allData].sort((a, b) => b.date.localeCompare(a.date));
@@ -451,8 +428,9 @@ function renderTable() {
     const tr = document.createElement('tr');
     const accClass = r.accuracy >= 60 ? 'acc-high' : r.accuracy >= 40 ? 'acc-mid' : r.accuracy !== null ? 'acc-low' : '';
     const badgeClass = r.model === 'thinking' ? 'badge-thinking' : r.version === 'v44.x' ? 'badge-v44' : 'badge-v43';
+    const versionLabel = r.model === 'thinking' ? 'thinking model' : r.version;
     tr.innerHTML = `
-      <td><span class="badge ${badgeClass}">${r.version}${r.model === 'thinking' ? ' 🧠' : ''}</span></td>
+      <td><span class="badge ${badgeClass}">${versionLabel}</span></td>
       <td>${r.date}</td>
       <td>${r.dataset}</td>
       <td class="${accClass}">${r.accuracy !== null ? r.accuracy.toFixed(2) : '–'}</td>
