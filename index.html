@@ -65,6 +65,52 @@
     .kpi .value { font-size: 1.9rem; font-weight: 700; margin-top: 6px; color: var(--kpi-color, var(--accent)); }
     .kpi .sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
 
+    /* ── Production accuracy card ── */
+    .prod-acc-wrap {
+      padding: 24px 40px 0;
+    }
+    .prod-acc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: inline-block;
+      min-width: 340px;
+    }
+    .prod-acc-card .card-header {
+      background: linear-gradient(90deg, rgba(56,189,248,0.18) 0%, rgba(129,140,248,0.12) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .prod-acc-card .card-header .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent3);
+      box-shadow: 0 0 6px var(--accent3);
+    }
+    .prod-acc-card .card-header span {
+      font-size: 0.82rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text);
+    }
+    .prod-acc-card table {
+      width: 100%; border-collapse: collapse; font-size: 0.84rem;
+    }
+    .prod-acc-card th {
+      padding: 10px 20px; text-align: left;
+      color: var(--muted); font-size: 0.73rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      background: var(--surface2);
+    }
+    .prod-acc-card td {
+      padding: 11px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .prod-acc-card td.acc-val {
+      font-weight: 700; font-size: 1.05rem;
+      color: var(--accent3);
+    }
+
     .section-title {
       padding: 32px 40px 0;
       font-size: 1.1rem;
@@ -83,24 +129,16 @@
 
     .chart-row {
       padding: 16px 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      display: flex; flex-direction: column; gap: 20px;
     }
     .chart-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px 28px;
-      width: 100%;
+      padding: 24px 28px; width: 100%;
     }
-    .chart-card h3 {
-      font-size: 0.92rem; font-weight: 600;
-      margin-bottom: 4px; color: var(--text);
-    }
-    .chart-card .hint {
-      font-size: 0.73rem; color: var(--muted); margin-bottom: 18px;
-    }
+    .chart-card h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .chart-card .hint { font-size: 0.73rem; color: var(--muted); margin-bottom: 18px; }
     .chart-card canvas { height: 340px !important; width: 100% !important; }
 
     .table-section { padding: 28px 40px 40px; border-top: 1px solid var(--border); margin-top: 12px; }
@@ -126,7 +164,8 @@
       border-top: 1px solid var(--border);
     }
     @media (max-width: 700px) {
-      header, .kpi-row, .section-title, .chart-row, .table-section { padding-left: 16px; padding-right: 16px; }
+      header, .kpi-row, .prod-acc-wrap, .section-title, .chart-row, .table-section { padding-left: 16px; padding-right: 16px; }
+      .prod-acc-card { min-width: 0; width: 100%; }
     }
   </style>
 </head>
@@ -165,6 +204,34 @@
     <div class="label">Best Hard Accuracy</div>
     <div class="value" id="kpiHard">–</div>
     <div class="sub" id="kpiHardSub"></div>
+  </div>
+</div>
+
+<!-- ── Latest Production Accuracy ── -->
+<div class="prod-acc-wrap">
+  <div class="prod-acc-card">
+    <div class="card-header">
+      <div class="dot"></div>
+      <span>Latest Production Accuracy</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Accuracy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Golden Dataset</td>
+          <td class="acc-val">68.5%</td>
+        </tr>
+        <tr>
+          <td>March Prod Dataset</td>
+          <td class="acc-val">65.0%</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -241,7 +308,6 @@
 const FILES = ['data/v44x.csv', 'data/v43x.csv'];
 let allData = [];
 
-// Distinct color palette per dataset name
 const DS_COLORS = [
   '#38bdf8','#818cf8','#34d399','#fb923c',
   '#f472b6','#a78bfa','#facc15','#4ade80','#f87171','#67e8f9'
@@ -258,13 +324,13 @@ async function loadAll() {
     Papa.parse(f, { download: true, header: true, skipEmptyLines: true, complete: r => resolve(r.data) });
   })));
   allData = results.flat().map(r => ({
-    version:  r.Version?.trim() || '',
-    date:     r.Date?.trim() || '',
-    dataset:  r.Dataset?.trim() || '',
-    accuracy: parseFloat(r.Accuracy) || null,
-    avgTime:  parseFloat(r.Avg_Time_per_Query) || null,
-    model:    r.GPT_Model?.trim() || '',
-    hardAcc:  parseFloat(r.Hard_Accuracy) || null,
+    version:   r.Version?.trim() || '',
+    date:      r.Date?.trim() || '',
+    dataset:   r.Dataset?.trim() || '',
+    accuracy:  parseFloat(r.Accuracy) || null,
+    avgTime:   parseFloat(r.Avg_Time_per_Query) || null,
+    model:     r.GPT_Model?.trim() || '',
+    hardAcc:   parseFloat(r.Hard_Accuracy) || null,
     precision: parseFloat(r.Precision) || null,
   }));
   renderKPIs();
@@ -278,7 +344,6 @@ async function loadAll() {
     new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// ── KPIs ──────────────────────────────────────────────────────────────
 function renderKPIs() {
   const accs = allData.filter(d => d.accuracy !== null);
   if (!accs.length) return;
@@ -299,7 +364,6 @@ function renderKPIs() {
   document.getElementById('kpiHardSub').textContent = bestHard ? bestHard.date : '';
 }
 
-// ── Chart helpers ─────────────────────────────────────────────────────
 function makeOptions(yLabel) {
   return {
     responsive: true,
@@ -310,7 +374,6 @@ function makeOptions(yLabel) {
         labels: { color: '#94a3b8', boxWidth: 12, padding: 16 },
         onClick(e, item, legend) {
           const ci = legend.chart;
-          // toggle both dot + line datasets (they come in pairs)
           const idx = item.datasetIndex;
           const partner = idx % 2 === 0 ? idx + 1 : idx - 1;
           [idx, partner].forEach(i => {
@@ -334,47 +397,29 @@ function makeOptions(yLabel) {
   };
 }
 
+Chart.defaults.plugins.legend.labels.filter = (item) => !item.text.endsWith('(line)');
+
 function dottedLineDatasets(groups, yField) {
-  // For each group, create a dot dataset + a smooth dotted-line dataset (hidden from legend)
   const datasets = [];
   Object.entries(groups).forEach(([key, rows]) => {
     const sorted = rows.filter(r => r[yField] !== null).sort((a, b) => a.date.localeCompare(b.date));
     const pts = sorted.map(r => ({ x: r.date, y: r[yField] }));
     const col = dsColor(key);
-    // Dots
     datasets.push({
-      label: key,
-      data: pts,
-      type: 'scatter',
-      backgroundColor: col,
-      borderColor: col,
-      pointRadius: 6,
-      pointHoverRadius: 9,
-      showLine: false,
-      order: 1,
+      label: key, data: pts, type: 'scatter',
+      backgroundColor: col, borderColor: col,
+      pointRadius: 6, pointHoverRadius: 9, showLine: false, order: 1,
     });
-    // Smooth dotted line (same label so tooltip groups them; hidden in legend via filter)
     datasets.push({
-      label: key + ' (line)',
-      data: pts,
-      type: 'line',
-      borderColor: col,
-      backgroundColor: 'transparent',
-      borderDash: [6, 5],
-      borderWidth: 2,
-      pointRadius: 0,
-      tension: 0.45,
-      showLine: true,
-      order: 2,
+      label: key + ' (line)', data: pts, type: 'line',
+      borderColor: col, backgroundColor: 'transparent',
+      borderDash: [6, 5], borderWidth: 2,
+      pointRadius: 0, tension: 0.45, showLine: true, order: 2,
     });
   });
   return datasets;
 }
 
-// Filter legend to hide "(line)" entries
-Chart.defaults.plugins.legend.labels.filter = (item) => !item.text.endsWith('(line)');
-
-// ── Accuracy charts ───────────────────────────────────────────────────
 function buildVersionAccChart(version, canvasId) {
   const rows = allData.filter(r => r.version === version);
   const datasets = [...new Set(rows.map(r => r.dataset))].sort();
@@ -387,7 +432,6 @@ function buildVersionAccChart(version, canvasId) {
   });
 }
 
-// ── Hard accuracy charts ──────────────────────────────────────────────
 function buildHardChart(version, canvasId) {
   const rows = allData.filter(r => r.version === version && r.hardAcc !== null);
   const groups = { [version + ' Hard Acc']: rows };
@@ -398,7 +442,6 @@ function buildHardChart(version, canvasId) {
   });
 }
 
-// ── Avg Time chart ────────────────────────────────────────────────────
 function buildTimeChart() {
   const rows = allData.filter(r => r.avgTime !== null);
   const datasets = [...new Set(rows.map(r => r.dataset))].sort();
@@ -411,7 +454,6 @@ function buildTimeChart() {
   });
 }
 
-// ── Table ─────────────────────────────────────────────────────────────
 function renderTable() {
   const tb = document.getElementById('tableBody');
   const sorted = [...allData].sort((a, b) => b.date.localeCompare(a.date));
