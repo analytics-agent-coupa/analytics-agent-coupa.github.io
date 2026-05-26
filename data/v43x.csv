@@ -1,0 +1,10 @@
+Version,Date,Dataset,Accuracy,Avg_Time_per_Query,GPT_Model,Hard_Accuracy,Precision
+v43.x,2025-07-15,Golden Data,58.97,,,,40
+v43.x,2025-07-15,Synthetic Data,26.33,,,,40
+v43.x,2025-07-15,QE Test Data,30.73,,,,40
+v43.x,2025-07-16,Golden Data,63.18,,,,40
+v43.x,2025-07-16,Synthetic Data,24.24,,,,40
+v43.x,2025-07-16,QE Test Data,37.42,,,,40
+v43.x,2025-10-08,Staging Data,62.75,,,,40
+v43.x,2025-10-24,revised_GD,63.50,,,24,40
+v43.x,2025-10-27,revised_GD,65.20,,,24.8,40
