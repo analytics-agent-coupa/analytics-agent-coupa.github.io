@@ -470,7 +470,6 @@ async function verifyPassphrase() {
 
   const hash = await hashString(entered);
   if (hash === PASSPHRASE_HASH) {
-    sessionStorage.setItem('aa_auth', hash);
     showDashboard();
   } else {
     input.classList.add('error');
@@ -484,14 +483,6 @@ function showDashboard() {
   document.getElementById('app').classList.add('visible');
   loadAll();
 }
-
-// Check if already authenticated in this session
-(async function checkSession() {
-  const stored = sessionStorage.getItem('aa_auth');
-  if (stored === PASSPHRASE_HASH) {
-    showDashboard();
-  }
-})();
 
 // ==================== DASHBOARD CODE ====================
 const FILES = ['data/v44x.csv', 'data/v43x.csv'];
